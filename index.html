@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>31 Días de Celebración</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import {
+      getAuth, signInWithEmailAndPassword, onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBGZnLfG1w-2gipGRAVNqF2S9Zk7xsAePM",
+      authDomain: "diasdecelebracion-3783e.firebaseapp.com",
+      projectId: "diasdecelebracion-3783e",
+      storageBucket: "diasdecelebracion-3783e.firebasestorage.app",
+      messagingSenderId: "230965566412",
+      appId: "1:230965566412:web:d6e1bb64654a9e60969b69"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // Fecha actual del calendario real
+    const today = new Date();
+    const day = today.getDate();
+
+    const container = document.getElementById("card-container");
+
+    async function mostrarTarjeta(dia) {
+      const ref = doc(db, "tarjetas", `dia-${dia}`);
+      const snap = await getDoc(ref);
+      if (snap.exists() && snap.data().visible) {
+        const data = snap.data();
+        container.innerHTML = `
+          <div class="card">
+            <h2>${data.titulo}</h2>
+            <p>${data.descripcion}</p>
+            <button onclick="marcarUsada(${dia})">Marcar como usada</button>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `<p>No hay tarjeta disponible aún para hoy.</p>`;
+      }
+    }
+
+    async function marcarUsada(dia) {
+      const ref = doc(db, "tarjetas", `dia-${dia}`);
+      await updateDoc(ref, { usada: true });
+      alert("¡Tarjeta marcada como usada!");
+    }
+
+    mostrarTarjeta(day);
+
+    // Modo administrador básico
+    const loginForm = document.getElementById("admin-login");
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = e.target.email.value;
+      const password = e.target.password.value;
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        alert("Login correcto. Puedes administrar tarjetas.");
+        // Aquí luego irá el panel de admin
+      } catch (err) {
+        alert("Error al iniciar sesión: " + err.message);
+      }
+    });
+    const passwordScreen = document.getElementById("password-screen");
+    const mainContent = document.body;
+    
+    const CLAVE_CORRECTA = "kirita"; // ✅ Cámbiala por la contraseña que quieras darle
+    
+    function verificarClave() {
+      const clave = document.getElementById("clave").value;
+      if (clave === CLAVE_CORRECTA) {
+        localStorage.setItem("autenticadoCelebracion", "true");
+        passwordScreen.style.display = "none";
+        mostrarTarjeta(day); // ahora sí carga la tarjeta del día
+      } else {
+        document.getElementById("error").innerText = "Contraseña incorrecta 😔";
+      }
+    }
+    
+    // Si ya se autenticó antes
+    if (localStorage.getItem("autenticadoCelebracion") === "true") {
+      passwordScreen.style.display = "none";
+      mostrarTarjeta(day);
+    } else {
+      // Ocultamos el contenido hasta que se autentique
+      container.innerHTML = "";
+    }
+
+
+  </script>
+  
+  <style>
+    body { font-family: sans-serif; padding: 2em; background: #fffaf8; color: #333; }
+    .card { border: 2px dashed #e89d9d; border-radius: 12px; padding: 1em; background: #fff0f5; }
+    button { background: #e26a6a; color: white; border: none; padding: 0.5em 1em; border-radius: 8px; cursor: pointer; }
+    button:hover { background: #c65555; }
+  </style>
+</head>
+<body>
+  <h1>🎉 31 Días de Celebración 🎉</h1>
+  <div id="password-screen">
+    <h2>🔐 Acceso privado</h2>
+    <p>Introduce la contraseña que te dio Josmil 💌</p>
+    <input type="password" id="clave" placeholder="Contraseña..." />
+    <button onclick="verificarClave()">Entrar</button>
+    <p id="error" style="color:red;"></p>
+  </div>
+  <div id="card-container">
+    <p>Cargando tarjeta de hoy...</p>
+  </div>
+
+  <hr />
+  <h3>Acceso administrador</h3>
+  <form id="admin-login">
+    <input type="email" name="email" placeholder="Tu email" required />
+    <input type="password" name="password" placeholder="Contraseña" required />
+    <button type="submit">Entrar</button>
+  </form>
+</body>
+</html>

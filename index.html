@@ -7,10 +7,10 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
-      getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc
+      getFirestore, doc, getDoc, updateDoc
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import {
-      getAuth, signInWithEmailAndPassword, onAuthStateChanged
+      getAuth, signInWithEmailAndPassword
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
@@ -55,9 +55,6 @@
       alert("¡Tarjeta marcada como usada!");
     }
 
-    mostrarTarjeta(day);
-
-    // Modo administrador básico
     const loginForm = document.getElementById("admin-login");
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -71,11 +68,10 @@
         alert("Error al iniciar sesión: " + err.message);
       }
     });
+
     const passwordScreen = document.getElementById("password-screen");
-    const mainContent = document.body;
-    
-    const CLAVE_CORRECTA = "kirita"; // ✅ Cámbiala por la contraseña que quieras darle
-    
+    const CLAVE_CORRECTA = "kirita";
+
     function verificarClave() {
       const clave = document.getElementById("clave").value;
       if (clave === CLAVE_CORRECTA) {
@@ -86,19 +82,19 @@
         document.getElementById("error").innerText = "Contraseña incorrecta 😔";
       }
     }
-    
+
+    // 🔓 Hacerla accesible globalmente
+    window.verificarClave = verificarClave;
+
     // Si ya se autenticó antes
     if (localStorage.getItem("autenticadoCelebracion") === "true") {
       passwordScreen.style.display = "none";
       mostrarTarjeta(day);
     } else {
-      // Ocultamos el contenido hasta que se autentique
       container.innerHTML = "";
     }
-
-
   </script>
-  
+
   <style>
     body { font-family: sans-serif; padding: 2em; background: #fffaf8; color: #333; }
     .card { border: 2px dashed #e89d9d; border-radius: 12px; padding: 1em; background: #fff0f5; }
@@ -108,6 +104,7 @@
 </head>
 <body>
   <h1>🎉 31 Días de Celebración 🎉</h1>
+
   <div id="password-screen">
     <h2>🔐 Acceso privado</h2>
     <p>Introduce la contraseña que te dio Josmil 💌</p>
@@ -115,6 +112,7 @@
     <button onclick="verificarClave()">Entrar</button>
     <p id="error" style="color:red;"></p>
   </div>
+
   <div id="card-container">
     <p>Cargando tarjeta de hoy...</p>
   </div>

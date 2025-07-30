@@ -7,10 +7,10 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
-      getFirestore, doc, getDoc, getDocs, updateDoc, collection, addDoc
+      getFirestore, doc, getDoc, getDocs, updateDoc, collection, setDoc
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import {
-      getAuth, signInWithEmailAndPassword, onAuthStateChanged
+      getAuth, signInWithEmailAndPassword
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
@@ -28,85 +28,78 @@
 
     const today = new Date();
     const day = today.getDate();
-    const container = document.getElementById("card-container");
-    const adminPanel = document.getElementById("admin-panel");
-    const formCrear = document.getElementById("form-crear-tarjeta");
+    const month = today.getMonth() + 1;
+    const year = today.getFullYear();
+    const fechaActual = new Date(`${year}-${month}-${day}`);
 
-    async function mostrarTarjeta(dia) {
-      const ref = doc(db, "tarjetas", `dia-${dia}`);
-      const snap = await getDoc(ref);
-      if (snap.exists() && snap.data().visible) {
-        const data = snap.data();
+    const container = document.getElementById("card-container");
+    const historialContainer = document.getElementById("historial-tarjetas");
+    const botonSorpresa = document.getElementById("boton-sorpresa");
+
+    async function cargarHistorial() {
+      const querySnapshot = await getDocs(collection(db, "tarjetas"));
+      let tarjetas = [];
+
+      querySnapshot.forEach((docu) => {
+        const data = docu.data();
+        const fechaDisponible = new Date(data.fechaDisponible);
+        if (fechaDisponible <= fechaActual && data.visible) {
+          tarjetas.push({ id: docu.id, ...data });
+        }
+      });
+
+      if (tarjetas.length === 0) {
+        historialContainer.innerHTML = "<p>No hay tarjetas desbloqueadas todavía.</p>";
+        return;
+      }
+
+      historialContainer.innerHTML = "";
+      tarjetas.sort((a, b) => a.id.localeCompare(b.id));
+      tarjetas.forEach((t) => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+          <h3>${t.titulo}</h3>
+          <p>${t.descripcion}</p>
+          <p><strong>Estado:</strong> ${t.usada ? "✅ Usada" : "🕒 Pendiente"}</p>
+          ${!t.usada ? `<button onclick="marcarUsadaPorId('${t.id}')">Marcar como usada</button>` : ""}
+        `;
+        historialContainer.appendChild(div);
+      });
+    }
+
+    window.marcarUsadaPorId = async (id) => {
+      const ref = doc(db, "tarjetas", id);
+      await updateDoc(ref, { usada: true });
+      alert("Tarjeta marcada como usada");
+      cargarHistorial();
+    };
+
+    botonSorpresa.addEventListener("click", async () => {
+      const querySnapshot = await getDocs(collection(db, "tarjetas"));
+      let encontrada = null;
+
+      querySnapshot.forEach((docu) => {
+        const data = docu.data();
+        if (data.liberadaPorBoton && !data.usada && data.visible) {
+          encontrada = { id: docu.id, ...data };
+        }
+      });
+
+      if (encontrada) {
         container.innerHTML = `
           <div class="card">
-            <h2>${data.titulo}</h2>
-            <p>${data.descripcion}</p>
-            <button onclick="marcarUsada(${dia})">Marcar como usada</button>
+            <h2>${encontrada.titulo}</h2>
+            <p>${encontrada.descripcion}</p>
+            <button onclick="marcarUsadaPorId('${encontrada.id}')">Marcar como usada</button>
           </div>
         `;
       } else {
-        container.innerHTML = `<p>No hay tarjeta disponible aún para hoy.</p>`;
-      }
-    }
-
-    async function marcarUsada(dia) {
-      const ref = doc(db, "tarjetas", `dia-${dia}`);
-      await updateDoc(ref, { usada: true });
-      alert("¡Tarjeta marcada como usada!");
-    }
-
-    const loginForm = document.getElementById("admin-login");
-    loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = e.target.email.value;
-      const password = e.target.password.value;
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        alert("Login correcto. Puedes administrar tarjetas.");
-        adminPanel.style.display = "block";
-      } catch (err) {
-        alert("Error al iniciar sesión: " + err.message);
+        alert("Aún no hay una tarjeta sorpresa activa.");
       }
     });
 
-    formCrear.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const dia = formCrear.dia.value;
-      const titulo = formCrear.titulo.value;
-      const descripcion = formCrear.descripcion.value;
-      const visible = formCrear.visible.checked;
-      const usada = false;
-
-      const ref = doc(db, "tarjetas", `dia-${dia}`);
-      await updateDoc(ref, { titulo, descripcion, visible, usada }).catch(async () => {
-        await setDoc(ref, { titulo, descripcion, visible, usada });
-      });
-
-      alert("Tarjeta creada o actualizada para el día " + dia);
-      formCrear.reset();
-    });
-
-    const passwordScreen = document.getElementById("password-screen");
-    const CLAVE_CORRECTA = "kirita";
-
-    function verificarClave() {
-      const clave = document.getElementById("clave").value;
-      if (clave === CLAVE_CORRECTA) {
-        localStorage.setItem("autenticadoCelebracion", "true");
-        passwordScreen.style.display = "none";
-        mostrarTarjeta(day);
-      } else {
-        document.getElementById("error").innerText = "Contraseña incorrecta 😔";
-      }
-    }
-    window.verificarClave = verificarClave;
-
-    if (localStorage.getItem("autenticadoCelebracion") === "true") {
-      passwordScreen.style.display = "none";
-      mostrarTarjeta(day);
-    } else {
-      container.innerHTML = "";
-    }
+    cargarHistorial();
   </script>
 
   <style>
@@ -114,41 +107,18 @@
     .card { border: 2px dashed #e89d9d; border-radius: 12px; padding: 1em; background: #fff0f5; margin-bottom: 1em; }
     button { background: #e26a6a; color: white; border: none; padding: 0.5em 1em; border-radius: 8px; cursor: pointer; }
     button:hover { background: #c65555; }
-    #admin-panel { display: none; margin-top: 2em; border-top: 1px solid #ccc; padding-top: 1em; }
   </style>
 </head>
 <body>
   <h1>🎉 31 Días de Celebración 🎉</h1>
 
-  <div id="password-screen">
-    <h2>🔐 Acceso privado</h2>
-    <p>Introduce la contraseña que te dio Josmil 💌</p>
-    <input type="password" id="clave" placeholder="Contraseña..." />
-    <button onclick="verificarClave()">Entrar</button>
-    <p id="error" style="color:red;"></p>
-  </div>
-
   <div id="card-container">
-    <p>Cargando tarjeta de hoy...</p>
+    <p>Descubre tu próxima tarjeta sorpresa:</p>
+    <button id="boton-sorpresa">🎁 Mostrar tarjeta nueva</button>
   </div>
 
   <hr />
-  <h3>Acceso administrador</h3>
-  <form id="admin-login">
-    <input type="email" name="email" placeholder="Tu email" required />
-    <input type="password" name="password" placeholder="Contraseña" required />
-    <button type="submit">Entrar</button>
-  </form>
-
-  <div id="admin-panel">
-    <h3>📋 Crear o editar tarjeta</h3>
-    <form id="form-crear-tarjeta">
-      <label>Día: <input type="number" name="dia" required min="1" max="31" /></label><br />
-      <label>Título: <input type="text" name="titulo" required /></label><br />
-      <label>Descripción:<br /><textarea name="descripcion" required rows="3" cols="40"></textarea></label><br />
-      <label>Visible: <input type="checkbox" name="visible" /></label><br />
-      <button type="submit">Guardar tarjeta</button>
-    </form>
-  </div>
+  <h2>🗂️ Tus tarjetas desbloqueadas</h2>
+  <div id="historial-tarjetas"></div>
 </body>
 </html>

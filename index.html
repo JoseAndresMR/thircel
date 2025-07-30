@@ -7,10 +7,10 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
-      getFirestore, doc, getDoc, updateDoc
+      getFirestore, doc, getDoc, getDocs, updateDoc, collection, addDoc
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import {
-      getAuth, signInWithEmailAndPassword
+      getAuth, signInWithEmailAndPassword, onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
@@ -26,11 +26,11 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // Fecha actual del calendario real
     const today = new Date();
     const day = today.getDate();
-
     const container = document.getElementById("card-container");
+    const adminPanel = document.getElementById("admin-panel");
+    const formCrear = document.getElementById("form-crear-tarjeta");
 
     async function mostrarTarjeta(dia) {
       const ref = doc(db, "tarjetas", `dia-${dia}`);
@@ -63,10 +63,27 @@
       try {
         await signInWithEmailAndPassword(auth, email, password);
         alert("Login correcto. Puedes administrar tarjetas.");
-        // Aquí luego irá el panel de admin
+        adminPanel.style.display = "block";
       } catch (err) {
         alert("Error al iniciar sesión: " + err.message);
       }
+    });
+
+    formCrear.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const dia = formCrear.dia.value;
+      const titulo = formCrear.titulo.value;
+      const descripcion = formCrear.descripcion.value;
+      const visible = formCrear.visible.checked;
+      const usada = false;
+
+      const ref = doc(db, "tarjetas", `dia-${dia}`);
+      await updateDoc(ref, { titulo, descripcion, visible, usada }).catch(async () => {
+        await setDoc(ref, { titulo, descripcion, visible, usada });
+      });
+
+      alert("Tarjeta creada o actualizada para el día " + dia);
+      formCrear.reset();
     });
 
     const passwordScreen = document.getElementById("password-screen");
@@ -77,16 +94,13 @@
       if (clave === CLAVE_CORRECTA) {
         localStorage.setItem("autenticadoCelebracion", "true");
         passwordScreen.style.display = "none";
-        mostrarTarjeta(day); // ahora sí carga la tarjeta del día
+        mostrarTarjeta(day);
       } else {
         document.getElementById("error").innerText = "Contraseña incorrecta 😔";
       }
     }
-
-    // 🔓 Hacerla accesible globalmente
     window.verificarClave = verificarClave;
 
-    // Si ya se autenticó antes
     if (localStorage.getItem("autenticadoCelebracion") === "true") {
       passwordScreen.style.display = "none";
       mostrarTarjeta(day);
@@ -97,9 +111,10 @@
 
   <style>
     body { font-family: sans-serif; padding: 2em; background: #fffaf8; color: #333; }
-    .card { border: 2px dashed #e89d9d; border-radius: 12px; padding: 1em; background: #fff0f5; }
+    .card { border: 2px dashed #e89d9d; border-radius: 12px; padding: 1em; background: #fff0f5; margin-bottom: 1em; }
     button { background: #e26a6a; color: white; border: none; padding: 0.5em 1em; border-radius: 8px; cursor: pointer; }
     button:hover { background: #c65555; }
+    #admin-panel { display: none; margin-top: 2em; border-top: 1px solid #ccc; padding-top: 1em; }
   </style>
 </head>
 <body>
@@ -124,5 +139,16 @@
     <input type="password" name="password" placeholder="Contraseña" required />
     <button type="submit">Entrar</button>
   </form>
+
+  <div id="admin-panel">
+    <h3>📋 Crear o editar tarjeta</h3>
+    <form id="form-crear-tarjeta">
+      <label>Día: <input type="number" name="dia" required min="1" max="31" /></label><br />
+      <label>Título: <input type="text" name="titulo" required /></label><br />
+      <label>Descripción:<br /><textarea name="descripcion" required rows="3" cols="40"></textarea></label><br />
+      <label>Visible: <input type="checkbox" name="visible" /></label><br />
+      <button type="submit">Guardar tarjeta</button>
+    </form>
+  </div>
 </body>
 </html>

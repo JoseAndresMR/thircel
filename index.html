@@ -90,7 +90,7 @@
           <h3>${t.titulo}</h3>
           <p>${t.descripcion}</p>
           <p><strong>Estado:</strong> ${t.usada ? "✅ Usada" : "🕒 Pendiente"}</p>
-          ${!t.usada ? `<button onclick="marcarUsadaPorId('${t.id}')">Marcar como usada</button>` : ""}
+          ${!t.usada ? `<button onclick=\"marcarUsadaPorId('${t.id}')\">Marcar como usada</button>` : ""}
         `;
         historialContainer.appendChild(div);
       });
@@ -119,7 +119,10 @@
       });
 
       if (yaAbiertaHoy && !modoAdmin) {
-        alert("Ya has abierto una tarjeta hoy. Intenta mañana 😊");
+        botonSorpresa.style.display = "none";
+        const msg = document.createElement("p");
+        msg.innerText = "Ya has abierto una tarjeta hoy. Intenta mañana 😊";
+        container.appendChild(msg);
         return;
       }
 
@@ -150,7 +153,10 @@
 
         cargarHistorial();
       } else {
-        alert("Aún no hay una tarjeta sorpresa activa.");
+        botonSorpresa.style.display = "none";
+        const msg = document.createElement("p");
+        msg.innerText = "Aún no hay una tarjeta sorpresa activa.";
+        container.appendChild(msg);
       }
     });
 

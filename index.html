@@ -26,6 +26,8 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
+    let modoAdmin = false;
+
     const today = new Date();
     const day = today.getDate();
     const month = today.getMonth() + 1;
@@ -90,7 +92,7 @@
         );
       });
 
-      if (yaAbiertaHoy) {
+      if (yaAbiertaHoy && !modoAdmin) {
         alert("Ya has abierto una tarjeta hoy. Intenta mañana 😊");
         return;
       }
@@ -125,6 +127,12 @@
         alert("Aún no hay una tarjeta sorpresa activa.");
       }
     });
+
+    // DEBUG SOLO PARA TI: modoAdmin manual desde consola
+    window.activarModoAdmin = () => {
+      modoAdmin = true;
+      alert("Modo administrador activado. Puedes abrir varias tarjetas hoy para pruebas.");
+    };
 
     cargarHistorial();
   </script>

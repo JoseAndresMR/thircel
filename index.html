@@ -32,6 +32,9 @@
     const year = today.getFullYear();
     const fechaActual = new Date(`${year}-${month}-${day}`);
 
+    const fechaClave = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+    const claveLocalStorage = `tarjeta-descubierta-${fechaClave}`;
+
     const container = document.getElementById("card-container");
     const historialContainer = document.getElementById("historial-tarjetas");
     const botonSorpresa = document.getElementById("boton-sorpresa");
@@ -76,6 +79,11 @@
     };
 
     botonSorpresa.addEventListener("click", async () => {
+      if (localStorage.getItem(claveLocalStorage)) {
+        alert("Ya has abierto una tarjeta hoy. Intenta mañana 😊");
+        return;
+      }
+
       const querySnapshot = await getDocs(collection(db, "tarjetas"));
       let encontrada = null;
 
@@ -90,6 +98,7 @@
       if (encontrada) {
         const ref = doc(db, "tarjetas", encontrada.id);
         await updateDoc(ref, { descubierta: true });
+        localStorage.setItem(claveLocalStorage, encontrada.id);
 
         container.innerHTML = `
           <div class="card">

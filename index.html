@@ -43,7 +43,7 @@
       querySnapshot.forEach((docu) => {
         const data = docu.data();
         const fechaDisponible = new Date(data.fechaDisponible);
-        if (fechaDisponible <= fechaActual && data.visible) {
+        if ((fechaDisponible <= fechaActual && data.visible) || (data.liberadaPorBoton && data.descubierta)) {
           tarjetas.push({ id: docu.id, ...data });
         }
       });
@@ -79,14 +79,18 @@
       const querySnapshot = await getDocs(collection(db, "tarjetas"));
       let encontrada = null;
 
-      querySnapshot.forEach((docu) => {
+      for (const docu of querySnapshot.docs) {
         const data = docu.data();
-        if (data.liberadaPorBoton && !data.usada && data.visible) {
+        if (data.liberadaPorBoton && !data.usada && data.visible && !data.descubierta) {
           encontrada = { id: docu.id, ...data };
+          break;
         }
-      });
+      }
 
       if (encontrada) {
+        const ref = doc(db, "tarjetas", encontrada.id);
+        await updateDoc(ref, { descubierta: true });
+
         container.innerHTML = `
           <div class="card">
             <h2>${encontrada.titulo}</h2>
@@ -94,6 +98,8 @@
             <button onclick="marcarUsadaPorId('${encontrada.id}')">Marcar como usada</button>
           </div>
         `;
+
+        cargarHistorial();
       } else {
         alert("Aún no hay una tarjeta sorpresa activa.");
       }

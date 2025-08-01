@@ -37,6 +37,32 @@
     const container = document.getElementById("card-container");
     const historialContainer = document.getElementById("historial-tarjetas");
     const botonSorpresa = document.getElementById("boton-sorpresa");
+    const passwordScreen = document.getElementById("password-screen");
+    const claveInput = document.getElementById("clave");
+    const errorMsg = document.getElementById("error");
+
+    const CLAVE_CORRECTA = "kirita";
+
+    if (localStorage.getItem("autenticadoCelebracion") !== "true") {
+      passwordScreen.style.display = "block";
+      container.style.display = "none";
+      historialContainer.style.display = "none";
+    } else {
+      cargarHistorial();
+    }
+
+    document.getElementById("btn-acceder").addEventListener("click", () => {
+      const clave = claveInput.value.trim();
+      if (clave === CLAVE_CORRECTA) {
+        localStorage.setItem("autenticadoCelebracion", "true");
+        passwordScreen.style.display = "none";
+        container.style.display = "block";
+        historialContainer.style.display = "block";
+        cargarHistorial();
+      } else {
+        errorMsg.innerText = "Contraseña incorrecta 😔";
+      }
+    });
 
     async function cargarHistorial() {
       const querySnapshot = await getDocs(collection(db, "tarjetas"));
@@ -128,13 +154,10 @@
       }
     });
 
-    // DEBUG SOLO PARA TI: modoAdmin manual desde consola
-    window.activarModoAdmin = () => {
+    self.activarModoAdmin = () => {
       modoAdmin = true;
       alert("Modo administrador activado. Puedes abrir varias tarjetas hoy para pruebas.");
     };
-
-    cargarHistorial();
   </script>
 
   <style>
@@ -146,6 +169,14 @@
 </head>
 <body>
   <h1>🎉 31 Días de Celebración 🎉</h1>
+
+  <div id="password-screen" style="display: none;">
+    <h2>🔐 Acceso privado</h2>
+    <p>Introduce la contraseña que te dio Josmil 💌</p>
+    <input type="password" id="clave" placeholder="Contraseña..." />
+    <button id="btn-acceder">Entrar</button>
+    <p id="error" style="color:red;"></p>
+  </div>
 
   <div id="card-container">
     <p>Descubre tu próxima tarjeta sorpresa:</p>

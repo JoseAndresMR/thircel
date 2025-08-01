@@ -7,7 +7,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
-      getFirestore, doc, getDoc, getDocs, updateDoc, collection, setDoc
+      getFirestore, doc, getDoc, getDocs, updateDoc, collection, setDoc, query, orderBy
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import {
       getAuth, signInWithEmailAndPassword
@@ -31,9 +31,6 @@
     const month = today.getMonth() + 1;
     const year = today.getFullYear();
     const fechaActual = new Date(`${year}-${month}-${day}`);
-
-    const fechaClave = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-    const claveLocalStorage = `tarjeta-descubierta-${fechaClave}`;
 
     const container = document.getElementById("card-container");
     const historialContainer = document.getElementById("historial-tarjetas");
@@ -79,15 +76,28 @@
     };
 
     botonSorpresa.addEventListener("click", async () => {
-      if (localStorage.getItem(claveLocalStorage)) {
+      const tarjetasRef = collection(db, "tarjetas");
+      const tarjetasSnap = await getDocs(tarjetasRef);
+
+      const yaAbiertaHoy = tarjetasSnap.docs.some(doc => {
+        const data = doc.data();
+        if (!data.fechaDescubierta) return false;
+        const fecha = new Date(data.fechaDescubierta.toDate ? data.fechaDescubierta.toDate() : data.fechaDescubierta);
+        return (
+          fecha.getDate() === today.getDate() &&
+          fecha.getMonth() === today.getMonth() &&
+          fecha.getFullYear() === today.getFullYear()
+        );
+      });
+
+      if (yaAbiertaHoy) {
         alert("Ya has abierto una tarjeta hoy. Intenta mañana 😊");
         return;
       }
 
-      const querySnapshot = await getDocs(collection(db, "tarjetas"));
       let encontrada = null;
 
-      for (const docu of querySnapshot.docs) {
+      for (const docu of tarjetasSnap.docs) {
         const data = docu.data();
         if (data.liberadaPorBoton && !data.usada && data.visible && !data.descubierta) {
           encontrada = { id: docu.id, ...data };
@@ -97,8 +107,10 @@
 
       if (encontrada) {
         const ref = doc(db, "tarjetas", encontrada.id);
-        await updateDoc(ref, { descubierta: true });
-        localStorage.setItem(claveLocalStorage, encontrada.id);
+        await updateDoc(ref, {
+          descubierta: true,
+          fechaDescubierta: new Date()
+        });
 
         container.innerHTML = `
           <div class="card">

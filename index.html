@@ -87,10 +87,15 @@
         const div = document.createElement("div");
         div.className = "card";
         div.innerHTML = `
-          <h3>${t.titulo}</h3>
-          <p>${t.descripcion}</p>
-          <p><strong>Estado:</strong> ${t.usada ? "✅ Usada" : "🕒 Pendiente"}</p>
-          ${!t.usada ? `<button onclick=\"marcarUsadaPorId('${t.id}')\">Marcar como usada</button>` : ""}
+          <div class="card-content">
+            <div class="card-text">
+              <h3>${t.titulo}</h3>
+              <p>${t.descripcion}</p>
+              <p><strong>Estado:</strong> ${t.usada ? "✅ Usada" : "🕒 Pendiente"}</p>
+              ${!t.usada ? `<button onclick=\"marcarUsadaPorId('${t.id}')\">Marcar como usada</button>` : ""}
+            </div>
+            ${t.imagen ? `<img class="card-image" src="${t.imagen}" alt="Imagen tarjeta" />` : ""}
+          </div>
         `;
         historialContainer.appendChild(div);
       });
@@ -145,9 +150,14 @@
 
         container.innerHTML = `
           <div class="card">
-            <h2>${encontrada.titulo}</h2>
-            <p>${encontrada.descripcion}</p>
-            <button onclick="marcarUsadaPorId('${encontrada.id}')">Marcar como usada</button>
+            <div class="card-content">
+              <div class="card-text">
+                <h2>${encontrada.titulo}</h2>
+                <p>${encontrada.descripcion}</p>
+                <button onclick="marcarUsadaPorId('${encontrada.id}')">Marcar como usada</button>
+              </div>
+              ${encontrada.imagen ? `<img class="card-image" src="${encontrada.imagen}" alt="Imagen tarjeta" />` : ""}
+            </div>
           </div>
         `;
 
@@ -168,7 +178,10 @@
 
   <style>
     body { font-family: sans-serif; padding: 2em; background: #fffaf8; color: #333; }
-    .card { border: 2px dashed #e89d9d; border-radius: 12px; padding: 1em; background: #fff0f5; margin-bottom: 1em; }
+    .card { border: 2px dashed #e89d9d; border-radius: 12px; padding: 1em; background: #fff0f5; margin-bottom: 1em; display: inline-block; max-width: 600px; }
+    .card-content { display: flex; align-items: center; gap: 1em; }
+    .card-text { flex: 1; }
+    .card-image { width: 120px; height: auto; border-radius: 8px; }
     button { background: #e26a6a; color: white; border: none; padding: 0.5em 1em; border-radius: 8px; cursor: pointer; }
     button:hover { background: #c65555; }
   </style>

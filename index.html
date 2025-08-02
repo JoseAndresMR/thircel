@@ -178,7 +178,7 @@
 
   <style>
     body {
-  font-family: sans-serif;
+  font-family: 'Segoe UI', sans-serif;
   padding: 2em;
   background: #fffaf8 url("https://joseandresmr.github.io/thircel/img/fondo.png") no-repeat center center fixed;
   background-size: cover;
@@ -196,53 +196,69 @@ h2,
 h3,
 p {
   background: rgba(255, 255, 255, 0.85);
-  padding: 1em;
-  border-radius: 12px;
-  margin-bottom: 1em;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 1.2em;
+  border-radius: 20px;
+  margin-bottom: 1.2em;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.container:hover,
+#card-container:hover,
+.card:hover,
+form:hover {
+  transform: scale(1.01);
 }
 
 .card {
-  border: 2px dashed #e89d9d;
-  border-radius: 12px;
-  padding: 1em;
-  background: rgba(255, 240, 245, 0.9);
-  margin-bottom: 1em;
+  border: none;
+  border-left: 8px solid #e89d9d;
+  border-radius: 16px;
+  padding: 1.5em;
+  background: rgba(255, 240, 245, 0.92);
+  margin-bottom: 1.5em;
   display: inline-block;
-  max-width: 600px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-width: 650px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
 }
 
 .card-content {
   display: flex;
   align-items: center;
-  gap: 1em;
+  gap: 1.5em;
 }
 
 .card-text {
   flex: 1;
-  color: #222;
+  color: #333;
+  font-size: 1.1em;
+  line-height: 1.6;
 }
 
 .card-image {
-  width: 120px;
+  width: 140px;
   height: auto;
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 button {
-  background: #e26a6a;
+  background: linear-gradient(to right, #f78ca0, #f9748f);
   color: white;
   border: none;
-  padding: 0.5em 1em;
-  border-radius: 8px;
+  padding: 0.7em 1.3em;
+  border-radius: 10px;
   cursor: pointer;
-  text-shadow: none;
+  font-weight: bold;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
 button:hover {
-  background: #c65555;
+  background: linear-gradient(to right, #f65c78, #f65175);
+  transform: translateY(-2px);
 }
+
   </style>
 </head>
 <body>

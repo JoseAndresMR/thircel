@@ -183,18 +183,34 @@
   background: #fffaf8 url("https://joseandresmr.github.io/thircel/img/fondo.png") no-repeat center center fixed;
   background-size: cover;
   color: #222;
-  text-shadow: 1px 1px 2px white;
+}
+
+.container,
+#card-container,
+#historial-tarjetas,
+#password-screen,
+form,
+input,
+h1,
+h2,
+h3,
+p {
+  background: rgba(255, 255, 255, 0.85);
+  padding: 1em;
+  border-radius: 12px;
+  margin-bottom: 1em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .card {
   border: 2px dashed #e89d9d;
   border-radius: 12px;
   padding: 1em;
-  background: rgba(255, 240, 245, 0.9); /* fondo translúcido para mejor contraste */
+  background: rgba(255, 240, 245, 0.9);
   margin-bottom: 1em;
   display: inline-block;
   max-width: 600px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* sombreado para resaltar */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .card-content {
@@ -206,7 +222,6 @@
 .card-text {
   flex: 1;
   color: #222;
-  text-shadow: 1px 1px 2px white;
 }
 
 .card-image {

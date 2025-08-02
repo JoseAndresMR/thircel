@@ -64,10 +64,11 @@
       }
     });
 
+    
     async function cargarHistorial() {
       const querySnapshot = await getDocs(collection(db, "tarjetas"));
       let tarjetas = [];
-
+    
       querySnapshot.forEach((docu) => {
         const data = docu.data();
         const fechaDisponible = new Date(data.fechaDisponible);
@@ -75,14 +76,15 @@
           tarjetas.push({ id: docu.id, ...data });
         }
       });
-
-      if (tarjetas.length === 0) {
-        historialContainer.innerHTML = "<p>No hay tarjetas desbloqueadas todavía.</p>";
-        return;
-      }
-
-      historialContainer.innerHTML = "";
+    
+      // Ordena las tarjetas por fecha o id
       tarjetas.sort((a, b) => a.id.localeCompare(b.id));
+    
+      const contenedorPendientes = document.getElementById("tarjetas-pendientes");
+      const contenedorUsadas = document.getElementById("tarjetas-usadas");
+      contenedorPendientes.innerHTML = "";
+      contenedorUsadas.innerHTML = "";
+    
       tarjetas.forEach((t) => {
         const div = document.createElement("div");
         div.className = "card";
@@ -97,9 +99,14 @@
             ${t.imagen ? `<img class="card-image" src="${t.imagen}" alt="Imagen tarjeta" />` : ""}
           </div>
         `;
-        historialContainer.appendChild(div);
+        if (t.usada) {
+          contenedorUsadas.appendChild(div);
+        } else {
+          contenedorPendientes.appendChild(div);
+        }
       });
     }
+
 
     window.marcarUsadaPorId = async (id) => {
       const ref = doc(db, "tarjetas", id);
@@ -308,6 +315,40 @@ button:hover {
 .toggle-section details[open] summary::before {
   transform: rotate(90deg);
 }
+    .toggle-section {
+  margin: 1em auto;
+  max-width: 800px;
+  text-align: left;
+}
+
+.toggle-section details {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  padding: 1em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1em;
+}
+
+.toggle-section summary {
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-bottom: 0.5em;
+  list-style: none;
+  position: relative;
+  padding-left: 1.5em;
+}
+
+.toggle-section summary::before {
+  content: "▶";
+  position: absolute;
+  left: 0;
+  transition: transform 0.3s ease;
+}
+
+.toggle-section details[open] summary::before {
+  transform: rotate(90deg);
+}
 
 footer {
   height: 100vh;
@@ -336,7 +377,16 @@ footer {
   </div>
 
   <hr />
-  <h2>🗂️ Tus tarjetas desbloqueadas</h2>
-  <div id="historial-tarjetas"></div>
+  <div class="toggle-section">
+    <details open>
+      <summary>🕒 Tarjetas pendientes</summary>
+      <div id="tarjetas-pendientes"></div>
+    </details>
+  
+    <details open>
+      <summary>✅ Tarjetas usadas</summary>
+      <div id="tarjetas-usadas"></div>
+    </details>
+  </div>
 </body>
 </html>

@@ -221,12 +221,20 @@ form:hover {
   border-radius: 16px;
   padding: 1.5em;
   background: rgba(255, 240, 245, 0.92);
-  margin-bottom: 1.5em;
+  margin: 1em;
   display: inline-block;
-  max-width: 650px;
+  max-width: 300px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
   transition: transform 0.3s ease;
   text-align: left;
+  vertical-align: top;
+}
+
+.card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1em;
 }
 
 .card-content {
@@ -266,6 +274,49 @@ button:hover {
   transform: translateY(-2px);
 }
 
+.toggle-section {
+  margin: 1em auto;
+  max-width: 800px;
+  text-align: left;
+}
+
+.toggle-section details {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  padding: 1em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1em;
+}
+
+.toggle-section summary {
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-bottom: 0.5em;
+  list-style: none;
+  position: relative;
+  padding-left: 1.5em;
+}
+
+.toggle-section summary::before {
+  content: "▶";
+  position: absolute;
+  left: 0;
+  transition: transform 0.3s ease;
+}
+
+.toggle-section details[open] summary::before {
+  transform: rotate(90deg);
+}
+
+footer {
+  height: 100vh;
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+}
   </style>
 </head>
 <body>

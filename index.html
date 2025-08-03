@@ -221,6 +221,50 @@
       modoAdmin = true;
       alert("Modo administrador activado. Puedes abrir varias tarjetas hoy para pruebas.");
     };
+    // BOTÓN SORPRESA NORMAL PARA USUARIA
+    const botonSorpresaUsuario = document.createElement("button");
+    botonSorpresaUsuario.textContent = "🎁 Abrir tarjeta sorpresa";
+    botonSorpresaUsuario.id = "boton-sorpresa-publico";
+    botonSorpresaUsuario.style.display = "none";
+    botonSorpresaUsuario.style.margin = "1em auto";
+    botonSorpresaUsuario.onclick = async () => {
+      const tarjetasRef = collection(db, "tarjetas");
+      const tarjetasSnap = await getDocs(tarjetasRef);
+      const candidatas = tarjetasSnap.docs.filter(doc => {
+        const data = doc.data();
+        return data.sorpresaPublica === true && !data.usada && !data.descubierta;
+      });
+    
+      if (candidatas.length === 0) {
+        alert("No hay tarjeta sorpresa disponible ahora.");
+        return;
+      }
+    
+      const elegida = candidatas[0];
+      await updateDoc(doc(db, "tarjetas", elegida.id), {
+        descubierta: true,
+        visible: true,
+        fechaDescubierta: new Date()
+      });
+    
+      alert("¡Has desbloqueado una tarjeta sorpresa!");
+      cargarHistorial();
+    };
+    
+    document.getElementById("card-container").appendChild(botonSorpresaUsuario);
+    
+    // NUEVO: CONTROLAR VISIBILIDAD CON VARIABLE EN FIRESTORE
+    async function controlarBotonDesdeFirebase() {
+      const configDoc = await getDoc(doc(db, "config", "general"));
+      if (configDoc.exists()) {
+        const data = configDoc.data();
+        if (data.mostrarBotonSorpresaPublico === true) {
+          document.getElementById("boton-sorpresa-publico").style.display = "block";
+        }
+      }
+    }
+    
+    controlarBotonDesdeFirebase();
   </script>
 
   <style>

@@ -99,6 +99,7 @@
           <div class="card-inner">
             <div class="card-text">
               <p>${t.descripcion}</p>
+              <p><strong>Estado:</strong> ${t.usada ? "✅ Usada" : "🕒 Pendiente"} ${!t.usada ? `<button onclick="marcarUsadaPorId('${t.id}')">Marcar como usada</button>` : ""}</p>
             </div>
             ${t.imagen ? `<img class="card-image" src="${t.imagen}" alt="Imagen tarjeta" />` : ""}
           </div>
@@ -163,7 +164,6 @@
                 <h2>${encontrada.titulo}</h2>
                 <p>${encontrada.descripcion}</p>
                 <button onclick="marcarUsadaPorId('${encontrada.id}')">Marcar como usada</button>
-                <p><strong>Estado:</strong> ${t.usada ? "✅ Usada" : "🕒 Pendiente"} ${!t.usada ? `<button onclick="marcarUsadaPorId('${t.id}')">Marcar como usada</button>` : ""}</p>
               </div>
               ${encontrada.imagen ? `<img class="card-image" src="${encontrada.imagen}" alt="Imagen tarjeta" />` : ""}
             </div>

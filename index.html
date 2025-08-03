@@ -124,7 +124,9 @@
             });
 
             if (candidatas.length === 0) {
-              alert("No hay tarjeta sorpresa disponible.");
+              const msg = document.createElement("p");
+              msg.innerText = "No hay tarjeta sorpresa disponible.";
+              document.getElementById("card-container").appendChild(msg);
               return;
             }
 

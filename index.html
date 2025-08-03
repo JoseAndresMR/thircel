@@ -133,13 +133,23 @@
       cargarHistorial();
     };
 
+    async function controlarBotonDesdeFirebase() {
+      const configDoc = await getDoc(doc(db, "config", "general"));
+      if (configDoc.exists()) {
+        const data = configDoc.data();
+        if (data.mostrarBotonSorpresaPublico === true) {
+          document.getElementById("card-container").appendChild(botonSorpresaDiaria);
+        }
+      }
+    }
+
     self.activarModoAdmin = () => {
       localStorage.setItem("modoAdminCelebracion", "true");
       alert("🔓 Modo administrador activado. Podrás abrir más de una tarjeta sorpresa.");
     };
 
     document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("card-container").appendChild(botonSorpresaDiaria);
+      controlarBotonDesdeFirebase();
       cargarHistorial();
     });
   </script>

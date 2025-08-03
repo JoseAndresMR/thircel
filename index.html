@@ -7,68 +7,28 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
-      getFirestore, doc, getDoc, getDocs, updateDoc, collection, setDoc, query, orderBy
+      getFirestore, doc, getDoc, getDocs, updateDoc, collection
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import {
-      getAuth, signInWithEmailAndPassword
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBGZnLfG1w-2gipGRAVNqF2S9Zk7xsAePM",
       authDomain: "diasdecelebracion-3783e.firebaseapp.com",
       projectId: "diasdecelebracion-3783e",
-      storageBucket: "diasdecelebracion-3783e.firebasestorage.app",
+      storageBucket: "diasdecelebracion-3783e.appspot.com",
       messagingSenderId: "230965566412",
       appId: "1:230965566412:web:d6e1bb64654a9e60969b69"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const auth = getAuth(app);
-
-    let modoAdmin = false;
 
     const today = new Date();
-    const day = today.getDate();
-    const month = today.getMonth() + 1;
-    const year = today.getFullYear();
-    const fechaActual = new Date(`${year}-${month}-${day}`);
+    const fechaActual = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-    const container = document.getElementById("card-container");
-    const historialContainer = document.getElementById("historial-tarjetas");
-    const botonSorpresa = document.getElementById("boton-sorpresa");
-    const passwordScreen = document.getElementById("password-screen");
-    const claveInput = document.getElementById("clave");
-    const errorMsg = document.getElementById("error");
-
-    const CLAVE_CORRECTA = "kirita";
-
-    if (localStorage.getItem("autenticadoCelebracion") !== "true") {
-      passwordScreen.style.display = "block";
-      container.style.display = "none";
-      historialContainer.style.display = "none";
-    } else {
-      cargarHistorial();
-    }
-
-    document.getElementById("btn-acceder").addEventListener("click", () => {
-      const clave = claveInput.value.trim();
-      if (clave === CLAVE_CORRECTA) {
-        localStorage.setItem("autenticadoCelebracion", "true");
-        passwordScreen.style.display = "none";
-        container.style.display = "block";
-        historialContainer.style.display = "block";
-        cargarHistorial();
-      } else {
-        errorMsg.innerText = "Contraseña incorrecta 😔";
-      }
-    });
-
-    
     async function cargarHistorial() {
       const querySnapshot = await getDocs(collection(db, "tarjetas"));
       let tarjetas = [];
-    
+
       querySnapshot.forEach((docu) => {
         const data = docu.data();
         const fechaDisponible = new Date(data.fechaDisponible);
@@ -76,24 +36,24 @@
           tarjetas.push({ id: docu.id, ...data });
         }
       });
-    
+
       tarjetas.sort((a, b) => a.id.localeCompare(b.id));
-    
+
       const contenedorPendientes = document.getElementById("tarjetas-pendientes");
       const contenedorUsadas = document.getElementById("tarjetas-usadas");
       contenedorPendientes.innerHTML = "";
       contenedorUsadas.innerHTML = "";
-    
+
       tarjetas.forEach((t) => {
         const details = document.createElement("details");
         details.className = "card-toggle tarjeta";
         const colorClase = `color-${Math.floor(Math.random() * 6) + 1}`;
         details.classList.add(colorClase);
-    
+
         const summary = document.createElement("summary");
         summary.innerHTML = `${t.titulo}`;
         details.appendChild(summary);
-    
+
         const contenidoHTML = `
           <div class="card-inner">
             <div class="card-text">
@@ -103,11 +63,11 @@
             ${t.imagen ? `<img class="card-image" src="${t.imagen}" alt="Imagen tarjeta" />` : ""}
           </div>
         `;
-    
+
         const contenido = document.createElement("div");
         contenido.innerHTML = contenidoHTML;
         details.appendChild(contenido);
-    
+
         if (t.usada) {
           contenedorUsadas.appendChild(details);
         } else {
@@ -115,7 +75,14 @@
         }
       });
     }
-        // BOTÓN SORPRESA NORMAL PARA USUARIA
+
+    window.marcarUsadaPorId = async (id) => {
+      const ref = doc(db, "tarjetas", id);
+      await updateDoc(ref, { usada: true });
+      alert("Tarjeta marcada como usada");
+      cargarHistorial();
+    };
+
     const botonSorpresaUsuario = document.createElement("button");
     botonSorpresaUsuario.textContent = "🎁 Abrir tarjeta sorpresa";
     botonSorpresaUsuario.id = "boton-sorpresa-publico";
@@ -128,132 +95,29 @@
         const data = doc.data();
         return data.sorpresaPublica === true && !data.usada && !data.descubierta;
       });
-    
+
       if (candidatas.length === 0) {
         alert("No hay tarjeta sorpresa disponible ahora.");
         return;
       }
-    
+
       const elegida = candidatas[0];
       await updateDoc(doc(db, "tarjetas", elegida.id), {
         descubierta: true,
         visible: true,
         fechaDescubierta: new Date()
       });
-    
+
       alert("¡Has desbloqueado una tarjeta sorpresa!");
       cargarHistorial();
     };
-    
-    document.getElementById("card-container").appendChild(botonSorpresaUsuario);
-    
-    function mostrarBotonSorpresaPublico() {
-      document.getElementById("boton-sorpresa-publico").style.display = "block";
-    }
-    
-    function activarBotonSorpresaPublico() {
-      mostrarBotonSorpresaPublico();
-    }
 
-    botonSorpresa.addEventListener("click", async () => {
-      const tarjetasRef = collection(db, "tarjetas");
-      const tarjetasSnap = await getDocs(tarjetasRef);
-
-      const yaAbiertaHoy = tarjetasSnap.docs.some(doc => {
-        const data = doc.data();
-        if (!data.fechaDescubierta) return false;
-        const fecha = new Date(data.fechaDescubierta.toDate ? data.fechaDescubierta.toDate() : data.fechaDescubierta);
-        return (
-          fecha.getDate() === today.getDate() &&
-          fecha.getMonth() === today.getMonth() &&
-          fecha.getFullYear() === today.getFullYear()
-        );
-      });
-
-      if (yaAbiertaHoy && !modoAdmin) {
-        botonSorpresa.style.display = "none";
-        const msg = document.createElement("p");
-        msg.innerText = "Ya has abierto una tarjeta hoy. Intenta mañana 😊";
-        container.appendChild(msg);
-        return;
-      }
-
-      let encontrada = null;
-
-      for (const docu of tarjetasSnap.docs) {
-        const data = docu.data();
-        if (data.liberadaPorBoton && !data.usada && data.visible && !data.descubierta) {
-          encontrada = { id: docu.id, ...data };
-          break;
-        }
-      }
-
-      if (encontrada) {
-        const ref = doc(db, "tarjetas", encontrada.id);
-        await updateDoc(ref, {
-          descubierta: true,
-          fechaDescubierta: new Date()
-        });
-
-        container.innerHTML = `
-          <div class="card">
-            <div class="card-content">
-              <div class="card-text">
-                <h2>${encontrada.titulo}</h2>
-                <p>${encontrada.descripcion}</p>
-                <button onclick="marcarUsadaPorId('${encontrada.id}')">Marcar como usada</button>
-              </div>
-              ${encontrada.imagen ? `<img class="card-image" src="${encontrada.imagen}" alt="Imagen tarjeta" />` : ""}
-            </div>
-          </div>
-        `;
-
-        cargarHistorial();
-      } else {
-        botonSorpresa.style.display = "none";
-        const msg = document.createElement("p");
-        msg.innerText = "Aún no hay una tarjeta sorpresa activa.";
-        container.appendChild(msg);
-      }
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("card-container").appendChild(botonSorpresaUsuario);
+      controlarBotonDesdeFirebase();
+      cargarHistorial();
     });
 
-    self.activarModoAdmin = () => {
-      modoAdmin = true;
-      alert("Modo administrador activado. Puedes abrir varias tarjetas hoy para pruebas.");
-    };
-    // BOTÓN SORPRESA NORMAL PARA USUARIA
-    const botonSorpresaUsuario = document.createElement("button");
-    botonSorpresaUsuario.textContent = "🎁 Abrir tarjeta sorpresa";
-    botonSorpresaUsuario.id = "boton-sorpresa-publico";
-    botonSorpresaUsuario.style.display = "none";
-    botonSorpresaUsuario.style.margin = "1em auto";
-    botonSorpresaUsuario.onclick = async () => {
-      const tarjetasRef = collection(db, "tarjetas");
-      const tarjetasSnap = await getDocs(tarjetasRef);
-      const candidatas = tarjetasSnap.docs.filter(doc => {
-        const data = doc.data();
-        return data.sorpresaPublica === true && !data.usada && !data.descubierta;
-      });
-    
-      if (candidatas.length === 0) {
-        alert("No hay tarjeta sorpresa disponible ahora.");
-        return;
-      }
-    
-      const elegida = candidatas[0];
-      await updateDoc(doc(db, "tarjetas", elegida.id), {
-        descubierta: true,
-        visible: true,
-        fechaDescubierta: new Date()
-      });
-    
-      alert("¡Has desbloqueado una tarjeta sorpresa!");
-      cargarHistorial();
-    };
-    
-    document.getElementById("card-container").appendChild(botonSorpresaUsuario);
-    
-    // NUEVO: CONTROLAR VISIBILIDAD CON VARIABLE EN FIRESTORE
     async function controlarBotonDesdeFirebase() {
       const configDoc = await getDoc(doc(db, "config", "general"));
       if (configDoc.exists()) {
@@ -263,251 +127,100 @@
         }
       }
     }
-    
-    controlarBotonDesdeFirebase();
   </script>
-
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap');
-    
     body {
-      font-family: 'Quicksand', sans-serif;
-      padding: 2em;
+      font-family: 'Segoe UI', sans-serif;
       background: #fffaf8 url("https://joseandresmr.github.io/thircel/img/fondo.png") no-repeat center center fixed;
       background-size: cover;
+      margin: 0;
+      padding: 2em;
       color: #222;
       text-align: center;
     }
-    
-    .container,
-    #card-container,
-    #historial-tarjetas,
-    #password-screen,
-    form,
-    input,
-    h1,
-    h2,
-    h3,
-    p {
-      background: rgba(255, 255, 255, 0.85);
-      padding: 0.8em 1em;
-      border-radius: 16px;
-      margin: 0.8em auto;
-      max-width: 800px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-      transition: transform 0.3s ease;
-      text-align: center;
-    }
-    
-    .container:hover,
-    #card-container:hover,
-    .card:hover,
-    form:hover {
-      transform: scale(1.01);
-    }
-    
-    .card {
-      border: none;
-      border-left: 8px solid #e89d9d;
-      border-radius: 16px;
-      padding: 1.5em;
-      background: rgba(255, 240, 245, 0.92);
-      margin: 1em;
-      display: inline-block;
-      max-width: 300px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-      transition: transform 0.3s ease;
-      text-align: left;
-      vertical-align: top;
-    }
-    
-    .card-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1em;
-    }
-    
-    .card-content {
-      display: flex;
-      align-items: center;
-      gap: 1.5em;
-    }
-    
-    .card-text {
-      flex: 1;
-      color: #333;
-      font-size: 1.1em;
-      line-height: 1.6;
-      text-align: left;
-    }
-    
-    .card-image {
-      width: 140px;
-      height: auto;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-    
-    button {
-      background: linear-gradient(to right, #f78ca0, #f9748f);
-      color: white;
-      border: none;
-      padding: 0.7em 1.3em;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.3s ease, transform 0.2s ease;
-    }
-    
-    button:hover {
-      background: linear-gradient(to right, #f65c78, #f65175);
-      transform: translateY(-2px);
-    }
-      
-    .toggle-section {
-      margin: 1em auto;
-      max-width: 800px;
-      text-align: left;
-    }
-    
-    .toggle-section details {
-      background: rgba(255, 255, 255, 0.85);
-      border-radius: 12px;
+
+    h1 {
+      background: rgba(255,255,255,0.8);
       padding: 1em;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      margin-bottom: 1em;
-      overflow: hidden;
-      transition: max-height 0.4s ease, padding 0.3s ease;
-      border-left: 5px solid #f78ca0;
+      border-radius: 12px;
+      max-width: 800px;
+      margin: auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    
-    .toggle-section summary {
-      cursor: pointer;
-      font-weight: bold;
-      font-size: 1.2em;
-      margin-bottom: 0.5em;
-      list-style: none;
-      position: relative;
-      padding-left: 1.5em;
+
+    .toggle-section {
+      margin: 2em auto;
+      max-width: 800px;
     }
-    
-    .toggle-section summary::before {
-      content: "📂";
-      position: absolute;
-      left: 0;
-      transition: transform 0.3s ease;
-    }
-    
-    .toggle-section details[open] summary::before {
-      transform: rotate(90deg);
-    }
-    
-    .card-toggle {
-      padding: 0.8em 1em;
-      border-radius: 14px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-      transition: all 0.3s ease;
-      margin-bottom: 1em;
+
+    details {
       background: rgba(255, 255, 255, 0.95);
-      border-left: 5px solid #ccc;
+      border-radius: 10px;
+      padding: 1em;
+      margin: 1em 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
     }
-    
-    .card-toggle summary {
-      font-size: 1.1em;
-      padding-left: 1.2em;
-      position: relative;
+
+    summary {
+      font-weight: bold;
+      cursor: pointer;
       list-style: none;
-      font-weight: 600;
+      outline: none;
+      font-size: 1.1em;
+      margin-bottom: 0.5em;
     }
-    
-    .card-toggle summary::before {
-      content: "📝";
-      position: absolute;
-      left: 0;
-      transition: transform 0.3s ease;
-    }
-    
-    .card-toggle[open] summary::before {
-      transform: rotate(90deg);
-    }
-    
-    .color-1 { border-left: 5px solid #f8b195; }
-    .color-2 { border-left: 5px solid #f67280; }
-    .color-3 { border-left: 5px solid #c06c84; }
-    .color-4 { border-left: 5px solid #6c5b7b; }
-    .color-5 { border-left: 5px solid #355c7d; }
-    .color-6 { border-left: 5px solid #99b898; }
-    
-    .card-toggle summary:hover {
-      color: #e26a6a;
-    }
-    
+
     .card-inner {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
+      justify-content: space-between;
       gap: 1em;
-      margin-top: 1em;
+      text-align: left;
     }
-    
+
     .card-text {
       flex: 1;
-      color: #333;
-      font-size: 1.05em;
-      line-height: 1.6;
     }
-    
+
     .card-image {
       width: 120px;
-      height: auto;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
     }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-5px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-        
-    footer {
-      height: 100vh;
-      background: transparent;
-      margin: 0;
-      padding: 0;
+
+    button {
+      background: #f9748f;
       border: none;
-      box-shadow: none;
+      color: white;
+      padding: 0.4em 1em;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
     }
+
+    .color-1 { border-left: 6px solid #f78ca0; }
+    .color-2 { border-left: 6px solid #ffb347; }
+    .color-3 { border-left: 6px solid #a0d995; }
+    .color-4 { border-left: 6px solid #81d4fa; }
+    .color-5 { border-left: 6px solid #ba68c8; }
+    .color-6 { border-left: 6px solid #ffd54f; }
   </style>
 </head>
 <body>
-  <h1>🎉 31 Días de Celebración 🎉</h1>
-
-  <div id="password-screen" style="display: none;">
-    <h2>🔐 Acceso privado</h2>
-    <p>Introduce la contraseña que te dio Josmil 💌</p>
-    <input type="password" id="clave" placeholder="Contraseña..." />
-    <button id="btn-acceder">Entrar</button>
-    <p id="error" style="color:red;"></p>
-  </div>
-
   <div id="card-container">
-    <p>Descubre tu próxima tarjeta sorpresa:</p>
-    <button id="boton-sorpresa">🎁 Mostrar tarjeta nueva</button>
+    <h1>🎉 31 Días de Celebración 🎉</h1>
   </div>
 
-  <hr />
   <div class="toggle-section">
     <details open>
       <summary>🕒 Tarjetas pendientes</summary>
       <div id="tarjetas-pendientes"></div>
     </details>
-  
+
     <details open>
       <summary>✅ Tarjetas usadas</summary>
       <div id="tarjetas-usadas"></div>
     </details>
   </div>
-  <footer></footer>
-
 </body>
 </html>

@@ -92,14 +92,13 @@
     
         const summary = document.createElement("summary");
         summary.innerHTML = `${t.titulo}`;
-    
         details.appendChild(summary);
     
         const contenidoHTML = `
           <div class="card-inner">
             <div class="card-text">
               <p>${t.descripcion}</p>
-              <p><strong>Estado:</strong> ${t.usada ? "✅ Usada" : "🕒 Pendiente"} ${!t.usada ? `<button onclick="marcarUsadaPorId('${t.id}')">Marcar como usada</button>` : ""}</p>
+              <p><strong>Estado:</strong> ${t.usada ? "✅ Usada" : "🕒 Pendiente"} ${!t.usada ? `<button onclick=\"marcarUsadaPorId('${t.id}')\">Marcar como usada</button>` : ""}</p>
             </div>
             ${t.imagen ? `<img class="card-image" src="${t.imagen}" alt="Imagen tarjeta" />` : ""}
           </div>
@@ -115,6 +114,45 @@
           contenedorPendientes.appendChild(details);
         }
       });
+    }
+        // BOTÓN SORPRESA NORMAL PARA USUARIA
+    const botonSorpresaUsuario = document.createElement("button");
+    botonSorpresaUsuario.textContent = "🎁 Abrir tarjeta sorpresa";
+    botonSorpresaUsuario.id = "boton-sorpresa-publico";
+    botonSorpresaUsuario.style.display = "none";
+    botonSorpresaUsuario.style.margin = "1em auto";
+    botonSorpresaUsuario.onclick = async () => {
+      const tarjetasRef = collection(db, "tarjetas");
+      const tarjetasSnap = await getDocs(tarjetasRef);
+      const candidatas = tarjetasSnap.docs.filter(doc => {
+        const data = doc.data();
+        return data.sorpresaPublica === true && !data.usada && !data.descubierta;
+      });
+    
+      if (candidatas.length === 0) {
+        alert("No hay tarjeta sorpresa disponible ahora.");
+        return;
+      }
+    
+      const elegida = candidatas[0];
+      await updateDoc(doc(db, "tarjetas", elegida.id), {
+        descubierta: true,
+        visible: true,
+        fechaDescubierta: new Date()
+      });
+    
+      alert("¡Has desbloqueado una tarjeta sorpresa!");
+      cargarHistorial();
+    };
+    
+    document.getElementById("card-container").appendChild(botonSorpresaUsuario);
+    
+    function mostrarBotonSorpresaPublico() {
+      document.getElementById("boton-sorpresa-publico").style.display = "block";
+    }
+    
+    function activarBotonSorpresaPublico() {
+      mostrarBotonSorpresaPublico();
     }
 
     botonSorpresa.addEventListener("click", async () => {

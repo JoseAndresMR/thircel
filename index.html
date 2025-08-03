@@ -91,9 +91,7 @@
         details.classList.add(colorClase);
     
         const summary = document.createElement("summary");
-        let estado = t.usada ? "✅ Usada" : "🕒 Pendiente";
-        let boton = !t.usada ? `<button onclick=\"marcarUsadaPorId('${t.id}')\">Marcar como usada</button>` : "";
-        summary.innerHTML = `${t.titulo}<br><small><strong>Estado:</strong> ${estado} ${boton}</small>`;
+        summary.innerHTML = `${t.titulo}`;
     
         details.appendChild(summary);
     
@@ -165,6 +163,7 @@
                 <h2>${encontrada.titulo}</h2>
                 <p>${encontrada.descripcion}</p>
                 <button onclick="marcarUsadaPorId('${encontrada.id}')">Marcar como usada</button>
+                <p><strong>Estado:</strong> ${t.usada ? "✅ Usada" : "🕒 Pendiente"} ${!t.usada ? `<button onclick="marcarUsadaPorId('${t.id}')">Marcar como usada</button>` : ""}</p>
               </div>
               ${encontrada.imagen ? `<img class="card-image" src="${encontrada.imagen}" alt="Imagen tarjeta" />` : ""}
             </div>

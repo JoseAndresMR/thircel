@@ -91,7 +91,9 @@
         details.classList.add(colorClase);
     
         const summary = document.createElement("summary");
-        summary.innerHTML = `${t.titulo}`;
+        let estado = t.usada ? "✅ Usada" : "🕒 Pendiente";
+        let boton = !t.usada ? `<button onclick=\"marcarUsadaPorId('${t.id}')\">Marcar como usada</button>` : "";
+        summary.innerHTML = `${t.titulo}<br><small><strong>Estado:</strong> ${estado} ${boton}</small>`;
     
         details.appendChild(summary);
     
@@ -99,8 +101,6 @@
           <div class="card-inner">
             <div class="card-text">
               <p>${t.descripcion}</p>
-              <p><strong>Estado:</strong> ${t.usada ? "✅ Usada" : "🕒 Pendiente"}</p>
-              ${!t.usada ? `<button onclick=\"marcarUsadaPorId('${t.id}')\">Marcar como usada</button>` : ""}
             </div>
             ${t.imagen ? `<img class="card-image" src="${t.imagen}" alt="Imagen tarjeta" />` : ""}
           </div>
@@ -117,14 +117,6 @@
         }
       });
     }
-    
-    window.marcarUsadaPorId = async (id) => {
-      const ref = doc(db, "tarjetas", id);
-      await updateDoc(ref, { usada: true });
-      alert("Tarjeta marcada como usada");
-      cargarHistorial();
-    };
-
     botonSorpresa.addEventListener("click", async () => {
       const tarjetasRef = collection(db, "tarjetas");
       const tarjetasSnap = await getDocs(tarjetasRef);
@@ -290,7 +282,7 @@
       background: linear-gradient(to right, #f65c78, #f65175);
       transform: translateY(-2px);
     }
-    
+      
     .toggle-section {
       margin: 1em auto;
       max-width: 800px;
@@ -335,7 +327,7 @@
       box-shadow: 0 4px 16px rgba(0,0,0,0.12);
       transition: all 0.3s ease;
       margin-bottom: 1em;
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95);
       border-left: 5px solid #ccc;
     }
     

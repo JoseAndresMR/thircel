@@ -91,11 +91,11 @@
         details.classList.add(colorClase);
     
         const summary = document.createElement("summary");
-        summary.innerHTML = `📩 ${t.titulo}`;
+        summary.innerHTML = `🎁 ${t.titulo}`;
     
-        const contenido = document.createElement("div");
-        contenido.className = "card card-content";
-        contenido.innerHTML = `
+        details.appendChild(summary);
+    
+        const contenidoHTML = `
           <div class="card-text">
             <p>${t.descripcion}</p>
             <p><strong>Estado:</strong> ${t.usada ? "✅ Usada" : "🕒 Pendiente"}</p>
@@ -104,7 +104,8 @@
           ${t.imagen ? `<img class="card-image" src="${t.imagen}" alt="Imagen tarjeta" />` : ""}
         `;
     
-        details.appendChild(summary);
+        const contenido = document.createElement("div");
+        contenido.innerHTML = contenidoHTML;
         details.appendChild(contenido);
     
         if (t.usada) {
@@ -114,7 +115,6 @@
         }
       });
     }
-
     window.marcarUsadaPorId = async (id) => {
       const ref = doc(db, "tarjetas", id);
       await updateDoc(ref, { usada: true });
@@ -332,6 +332,7 @@
       box-shadow: 0 4px 16px rgba(0,0,0,0.12);
       transition: all 0.3s ease;
       margin-bottom: 1em;
+      background: rgba(255, 240, 245, 0.92);
     }
     
     .card-toggle summary {
@@ -363,6 +364,21 @@
     
     .card-toggle summary:hover {
       color: #e26a6a;
+    }
+    
+    .card-text {
+      color: #333;
+      font-size: 1.1em;
+      line-height: 1.6;
+      margin-top: 1em;
+    }
+    
+    .card-image {
+      width: 140px;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-top: 1em;
     }
     
     @keyframes fadeIn {

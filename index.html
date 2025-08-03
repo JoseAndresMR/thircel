@@ -117,6 +117,7 @@
         }
       });
     }
+
     botonSorpresa.addEventListener("click", async () => {
       const tarjetasRef = collection(db, "tarjetas");
       const tarjetasSnap = await getDocs(tarjetasRef);

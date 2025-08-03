@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>31 Días de Celebración</title>
-
-  <!-- Firebase y lógica principal -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
@@ -27,7 +25,6 @@
     const today = new Date();
     const fechaActual = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-    // Función para cargar historial
     async function cargarHistorial() {
       const querySnapshot = await getDocs(collection(db, "tarjetas"));
       let tarjetas = [];
@@ -61,9 +58,7 @@
           <div class="card-inner">
             <div class="card-text">
               <p>${t.descripcion}</p>
-              <p><strong>Estado:</strong> ${t.usada ? "✅ Usada" : "🕒 Pendiente"} ${
-          !t.usada ? `<button onclick="marcarUsadaPorId('${t.id}')">Marcar como usada</button>` : ""
-        }</p>
+              <p><strong>Estado:</strong> ${t.usada ? "✅ Usada" : "🕒 Pendiente"} ${!t.usada ? `<button onclick=\"marcarUsadaPorId('${t.id}')\">Marcar como usada</button>` : ""}</p>
             </div>
             ${t.imagen ? `<img class="card-image" src="${t.imagen}" alt="Imagen tarjeta" />` : ""}
           </div>
@@ -81,7 +76,6 @@
       });
     }
 
-    // Marcar tarjeta como usada
     window.marcarUsadaPorId = async (id) => {
       const ref = doc(db, "tarjetas", id);
       await updateDoc(ref, { usada: true });
@@ -89,85 +83,78 @@
       cargarHistorial();
     };
 
-    // Modo admin para permitir más de una por día
-    self.activarModoAdmin = () => {
-      localStorage.setItem("modoAdminCelebracion", "true");
-      alert("🔓 Modo administrador activado. Podrás abrir más de una tarjeta sorpresa.");
-    };
-
-    // Mostrar botón sorpresa si config lo permite
     async function controlarBotonDesdeFirebase() {
       const configDoc = await getDoc(doc(db, "config", "general"));
       if (configDoc.exists()) {
         const data = configDoc.data();
         if (data.mostrarBotonSorpresaPublico === true) {
-          mostrarBotonSorpresa();
+          const botonSorpresaDiaria = document.createElement("button");
+          botonSorpresaDiaria.textContent = "🎁 Mostrar tarjeta nueva";
+          botonSorpresaDiaria.id = "boton-sorpresa-diario";
+          botonSorpresaDiaria.style.margin = "1em auto";
+
+          botonSorpresaDiaria.onclick = async () => {
+            const tarjetasRef = collection(db, "tarjetas");
+            const tarjetasSnap = await getDocs(tarjetasRef);
+
+            const yaAbiertaHoy = tarjetasSnap.docs.some(doc => {
+              const data = doc.data();
+              if (!data.fechaDescubierta) return false;
+              const fecha = new Date(data.fechaDescubierta.toDate ? data.fechaDescubierta.toDate() : data.fechaDescubierta);
+              return (
+                fecha.getDate() === today.getDate() &&
+                fecha.getMonth() === today.getMonth() &&
+                fecha.getFullYear() === today.getFullYear()
+              );
+            });
+
+            const modoAdmin = localStorage.getItem("modoAdminCelebracion") === "true";
+
+            if (yaAbiertaHoy && !modoAdmin) {
+              botonSorpresaDiaria.style.display = "none";
+              const msg = document.createElement("p");
+              msg.innerText = "Ya has abierto una tarjeta hoy. Intenta mañana 😊";
+              document.getElementById("card-container").appendChild(msg);
+              return;
+            }
+
+            const candidatas = tarjetasSnap.docs.filter(doc => {
+              const data = doc.data();
+              return data.sorpresaPublica === true && !data.usada && data.visible && !data.descubierta;
+            });
+
+            if (candidatas.length === 0) {
+              const msg = document.createElement("p");
+              msg.innerText = "No hay tarjeta sorpresa disponible.";
+              document.getElementById("card-container").appendChild(msg);
+              return;
+            }
+
+            const elegida = candidatas[0];
+            await updateDoc(doc(db, "tarjetas", elegida.id), {
+              descubierta: new Date(),
+              fechaDescubierta: new Date()
+            });
+
+            alert("¡Has desbloqueado una tarjeta sorpresa!");
+            cargarHistorial();
+          };
+
+          document.getElementById("card-container").appendChild(botonSorpresaDiaria);
         }
       }
     }
 
-    async function mostrarBotonSorpresa() {
-      const boton = document.createElement("button");
-      boton.id = "boton-sorpresa-diario";
-      boton.textContent = "🎁 Mostrar tarjeta nueva";
-      boton.style.margin = "1em auto";
-
-      boton.onclick = async () => {
-        const tarjetasRef = collection(db, "tarjetas");
-        const tarjetasSnap = await getDocs(tarjetasRef);
-
-        const yaAbiertaHoy = tarjetasSnap.docs.some(doc => {
-          const data = doc.data();
-          if (!data.fechaDescubierta) return false;
-          const fecha = new Date(data.fechaDescubierta.toDate ? data.fechaDescubierta.toDate() : data.fechaDescubierta);
-          return (
-            fecha.getDate() === today.getDate() &&
-            fecha.getMonth() === today.getMonth() &&
-            fecha.getFullYear() === today.getFullYear()
-          );
-        });
-
-        const modoAdmin = localStorage.getItem("modoAdminCelebracion") === "true";
-        if (yaAbiertaHoy && !modoAdmin) {
-          boton.style.display = "none";
-          const msg = document.createElement("p");
-          msg.innerText = "Ya has abierto una tarjeta hoy. Intenta mañana 😊";
-          document.getElementById("card-container").appendChild(msg);
-          return;
-        }
-
-        const candidatas = tarjetasSnap.docs.filter(doc => {
-          const data = doc.data();
-          return data.liberadaPorBoton && !data.usada && data.visible && !data.descubierta;
-        });
-
-        if (candidatas.length === 0) {
-          const msg = document.createElement("p");
-          msg.innerText = "No hay tarjeta sorpresa disponible.";
-          document.getElementById("card-container").appendChild(msg);
-          return;
-        }
-
-        const elegida = candidatas[0];
-        await updateDoc(doc(db, "tarjetas", elegida.id), {
-          descubierta: new Date(),
-          fechaDescubierta: new Date()
-        });
-
-        alert("¡Has desbloqueado una tarjeta sorpresa!");
-        cargarHistorial();
-      };
-
-      document.getElementById("card-container").appendChild(boton);
-    }
+    self.activarModoAdmin = () => {
+      localStorage.setItem("modoAdminCelebracion", "true");
+      alert("🔓 Modo administrador activado. Podrás abrir más de una tarjeta sorpresa.");
+    };
 
     document.addEventListener("DOMContentLoaded", () => {
       controlarBotonDesdeFirebase();
       cargarHistorial();
     });
   </script>
-
-  <!-- Estilos -->
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -250,10 +237,11 @@
       background: transparent;
       margin: 0;
       padding: 0;
+      border: none;
+      box-shadow: none;
     }
   </style>
 </head>
-
 <body>
   <div id="card-container">
     <h1>🎉 31 Días de Celebración 🎉</h1>

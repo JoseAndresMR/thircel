@@ -112,6 +112,11 @@
       cargarHistorial();
     };
 
+    self.activarModoAdmin = () => {
+      localStorage.setItem("modoAdminCelebracion", "true");
+      alert("🔓 Modo administrador activado. Podrás abrir más de una tarjeta sorpresa.");
+    };
+
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("card-container").appendChild(botonSorpresaUsuario);
       controlarBotonDesdeFirebase();
@@ -140,7 +145,7 @@
     }
 
     h1 {
-      background: rgba(255,255,255,0.8);
+      background: rgba(255,255,255,0.75);
       padding: 1em;
       border-radius: 12px;
       max-width: 800px;
@@ -154,7 +159,7 @@
     }
 
     details {
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.65);
       border-radius: 10px;
       padding: 1em;
       margin: 1em 0;
@@ -204,6 +209,15 @@
     .color-4 { border-left: 6px solid #81d4fa; }
     .color-5 { border-left: 6px solid #ba68c8; }
     .color-6 { border-left: 6px solid #ffd54f; }
+
+    footer {
+      height: 100vh;
+      background: transparent;
+      margin: 0;
+      padding: 0;
+      border: none;
+      box-shadow: none;
+    }
   </style>
 </head>
 <body>
@@ -222,5 +236,7 @@
       <div id="tarjetas-usadas"></div>
     </details>
   </div>
+
+  <footer></footer>
 </body>
 </html>

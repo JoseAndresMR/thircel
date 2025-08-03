@@ -132,7 +132,7 @@
 
             const elegida = candidatas[0];
             await updateDoc(doc(db, "tarjetas", elegida.id), {
-              descubierta: new Date(),
+              descubierta: true,
               fechaDescubierta: new Date()
             });
 
@@ -181,7 +181,7 @@
     }
 
     details {
-      background: rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.55);
       border-radius: 10px;
       padding: 1em;
       margin: 1em 0;

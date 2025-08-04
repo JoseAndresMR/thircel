@@ -191,6 +191,7 @@
         font-size: 1.2em;
         margin-bottom: 0.5em;
         cursor: pointer;
+        list-style: none;
       }
       summary::-webkit-details-marker {
         display: none;
@@ -245,11 +246,11 @@
     </div>
     <div class="toggle-section">
       <details open>
-        <summary>🕒 Tarjetas pendientes</summary>
+        <summary><span class="summary-clickable">🕒 Tarjetas pendientes</span></summary>
         <div id="tarjetas-lista"></div>
       </details>
       <details open>
-        <summary>✅ Tarjetas usadas</summary>
+        <summary><span class="summary-clickable">✅ Tarjetas usadas</span></summary>
         <div id="tarjetas-usadas"></div>
       </details>
     </div>

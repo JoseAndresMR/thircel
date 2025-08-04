@@ -31,8 +31,7 @@
 
       querySnapshot.forEach((docu) => {
         const data = docu.data();
-        const fechaDisponible = new Date(data.fechaDisponible);
-        if ((fechaDisponible <= fechaActual && data.visible) || (data.liberadaPorBoton && data.descubierta)) {
+        if (data.descubierta && data.visible) {
           tarjetas.push({ id: docu.id, ...data });
         }
       });

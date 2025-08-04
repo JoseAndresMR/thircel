@@ -83,40 +83,69 @@
       cargarHistorial();
     };
 
-    async function mostrarBotonSorpresa() {
-      const botonSorpresa = document.createElement("button");
-      botonSorpresa.textContent = "✨ Mostrar tarjeta sorpresa";
-      botonSorpresa.id = "boton-sorpresa";
-      botonSorpresa.style.margin = "1em auto";
+    window.mostrarTarjetaNueva = async () => {
+      const tarjetasRef = collection(db, "tarjetas");
+      const tarjetasSnap = await getDocs(tarjetasRef);
 
-      botonSorpresa.onclick = async () => {
-        const tarjetasRef = collection(db, "tarjetas");
-        const tarjetasSnap = await getDocs(tarjetasRef);
+      const hoy = new Date().toISOString().split("T")[0];
+      const ultima = localStorage.getItem("ultimaTarjetaMostrada");
 
-        const candidatas = tarjetasSnap.docs.filter(doc => {
-          const data = doc.data();
-          return data.sorpresaPublica === true && !data.usada && data.visible && !data.descubierta;
-        });
+      if (ultima === hoy && localStorage.getItem("modoAdminCelebracion") !== "true") {
+        alert("Ya has descubierto la tarjeta de hoy.");
+        return;
+      }
 
-        if (candidatas.length === 0) {
-          const msg = document.createElement("p");
-          msg.innerText = "No hay tarjeta sorpresa disponible.";
-          document.getElementById("card-container").appendChild(msg);
-          return;
-        }
+      const candidatas = tarjetasSnap.docs.filter(doc => {
+        const data = doc.data();
+        return (
+          !data.usada &&
+          !data.descubierta &&
+          data.visible &&
+          new Date(data.fechaDisponible).toISOString().split("T")[0] <= hoy
+        );
+      });
 
-        const elegida = candidatas[0];
-        await updateDoc(doc(db, "tarjetas", elegida.id), {
-          descubierta: true,
-          fechaDescubierta: new Date()
-        });
+      if (candidatas.length === 0) {
+        alert("No hay tarjetas disponibles para hoy.");
+        return;
+      }
 
-        alert("¡Has desbloqueado una tarjeta sorpresa!");
-        cargarHistorial();
-      };
+      const siguiente = candidatas[0];
+      await updateDoc(doc(db, "tarjetas", siguiente.id), {
+        descubierta: true,
+        fechaDescubierta: new Date()
+      });
 
-      document.getElementById("card-container").appendChild(botonSorpresa);
-    }
+      localStorage.setItem("ultimaTarjetaMostrada", hoy);
+      alert("¡Has descubierto una nueva tarjeta!");
+      cargarHistorial();
+    };
+
+    window.mostrarTarjetaSorpresa = async () => {
+      const tarjetasRef = collection(db, "tarjetas");
+      const tarjetasSnap = await getDocs(tarjetasRef);
+
+      const candidatas = tarjetasSnap.docs.filter(doc => {
+        const data = doc.data();
+        return data.sorpresaPublica === true && !data.usada && data.visible && !data.descubierta;
+      });
+
+      if (candidatas.length === 0) {
+        const msg = document.createElement("p");
+        msg.innerText = "No hay tarjeta sorpresa disponible.";
+        document.getElementById("card-container").appendChild(msg);
+        return;
+      }
+
+      const elegida = candidatas[0];
+      await updateDoc(doc(db, "tarjetas", elegida.id), {
+        descubierta: true,
+        fechaDescubierta: new Date()
+      });
+
+      alert("¡Has desbloqueado una tarjeta sorpresa!");
+      cargarHistorial();
+    };
 
     self.activarModoAdmin = () => {
       localStorage.setItem("modoAdminCelebracion", "true");
@@ -124,7 +153,6 @@
     };
 
     document.addEventListener("DOMContentLoaded", () => {
-      mostrarBotonSorpresa();
       cargarHistorial();
     });
   </script>
@@ -146,6 +174,13 @@
       max-width: 800px;
       margin: auto;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    #botones-superiores {
+      display: flex;
+      justify-content: center;
+      gap: 1em;
+      margin: 1em auto;
     }
 
     .toggle-section {
@@ -218,6 +253,10 @@
 <body>
   <div id="card-container">
     <h1>🎉 31 Días de Celebración 🎉</h1>
+    <div id="botones-superiores">
+      <button onclick="mostrarTarjetaNueva()">🎁 Mostrar tarjeta nueva</button>
+      <button onclick="mostrarTarjetaSorpresa()">✨ Mostrar tarjeta sorpresa</button>
+    </div>
   </div>
 
   <div class="toggle-section">

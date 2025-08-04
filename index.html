@@ -106,7 +106,7 @@
         details.open = true;
 
         const summary = document.createElement("summary");
-        summary.textContent = data.titulo;
+        summary.innerHTML = `<span class="summary-clickable">${data.titulo}</span>`;
         details.appendChild(summary);
 
         const div = document.createElement("div");
@@ -171,7 +171,7 @@
         margin: 1em auto;
         border-radius: 16px;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-        background: rgba(255, 255, 255, 0.6);
+        background: rgba(255, 255, 255, 0.95);
       }
       .toggle-section {
         max-width: 800px;
@@ -181,7 +181,7 @@
         background: transparent;
       }
       details {
-        background: rgba(255, 255, 255, 0.6);
+        background: rgba(255, 255, 255, 0.95);
         padding: 1em;
         margin: 1em 0;
         border-radius: 10px;
@@ -190,6 +190,15 @@
         font-weight: bold;
         font-size: 1.2em;
         margin-bottom: 0.5em;
+        cursor: pointer;
+      }
+      summary::-webkit-details-marker {
+        display: none;
+      }
+      .summary-clickable {
+        display: inline-block;
+        width: 100%;
+        cursor: pointer;
       }
       .card-content {
         display: flex;

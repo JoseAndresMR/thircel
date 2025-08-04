@@ -83,63 +83,25 @@
       cargarHistorial();
     };
 
-    self.activarModoAdmin = () => {
-      localStorage.setItem("modoAdminCelebracion", "true");
-      alert("🔓 Modo administrador activado. Podrás abrir más de una tarjeta sorpresa.");
-    };
+    async function mostrarBotonSorpresa() {
+      const botonSorpresa = document.createElement("button");
+      botonSorpresa.textContent = "✨ Mostrar tarjeta sorpresa";
+      botonSorpresa.id = "boton-sorpresa";
+      botonSorpresa.style.margin = "1em auto";
 
-    document.addEventListener("DOMContentLoaded", async () => {
-      cargarHistorial();
-
-      const contenedor = document.getElementById("card-container");
-
-      const botonSorpresaDiaria = document.createElement("button");
-      botonSorpresaDiaria.textContent = "🎁 Mostrar tarjeta nueva";
-      botonSorpresaDiaria.id = "boton-sorpresa-diario";
-      botonSorpresaDiaria.style.margin = "1em auto";
-
-      botonSorpresaDiaria.onclick = async () => {
+      botonSorpresa.onclick = async () => {
         const tarjetasRef = collection(db, "tarjetas");
         const tarjetasSnap = await getDocs(tarjetasRef);
 
-        const yaAbiertaHoy = tarjetasSnap.docs.some(doc => {
-          const data = doc.data();
-          if (!data.fechaDescubierta) return false;
-          const fecha = new Date(data.fechaDescubierta.toDate ? data.fechaDescubierta.toDate() : data.fechaDescubierta);
-          return (
-            fecha.getDate() === today.getDate() &&
-            fecha.getMonth() === today.getMonth() &&
-            fecha.getFullYear() === today.getFullYear()
-          );
-        });
-
-        const modoAdmin = localStorage.getItem("modoAdminCelebracion") === "true";
-
-        if (yaAbiertaHoy && !modoAdmin) {
-          botonSorpresaDiaria.style.display = "none";
-          const msg = document.createElement("p");
-          msg.innerText = "Ya has abierto una tarjeta hoy. Intenta mañana 😊";
-          contenedor.appendChild(msg);
-          return;
-        }
-
         const candidatas = tarjetasSnap.docs.filter(doc => {
           const data = doc.data();
-          return (
-            data.sorpresaPublica === true &&
-            !data.usada &&
-            data.visible === true &&
-            data.descubierta !== true
-          );
+          return data.sorpresaPublica === true && !data.usada && data.visible && !data.descubierta;
         });
 
         if (candidatas.length === 0) {
-          if (!document.getElementById("no-sorpresa-msg")) {
-            const msg = document.createElement("p");
-            msg.id = "no-sorpresa-msg";
-            msg.innerText = "No hay tarjeta sorpresa disponible.";
-            contenedor.appendChild(msg);
-          }
+          const msg = document.createElement("p");
+          msg.innerText = "No hay tarjeta sorpresa disponible.";
+          document.getElementById("card-container").appendChild(msg);
           return;
         }
 
@@ -153,7 +115,17 @@
         cargarHistorial();
       };
 
-      contenedor.appendChild(botonSorpresaDiaria);
+      document.getElementById("card-container").appendChild(botonSorpresa);
+    }
+
+    self.activarModoAdmin = () => {
+      localStorage.setItem("modoAdminCelebracion", "true");
+      alert("🔓 Modo administrador activado. Podrás abrir más de una tarjeta sorpresa.");
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      mostrarBotonSorpresa();
+      cargarHistorial();
     });
   </script>
   <style>

@@ -83,76 +83,77 @@
       cargarHistorial();
     };
 
-    async function controlarBotonDesdeFirebase() {
-      const configDoc = await getDoc(doc(db, "config", "general"));
-      if (configDoc.exists()) {
-        const data = configDoc.data();
-        if (data.mostrarBotonSorpresaPublico === true) {
-          const botonSorpresaDiaria = document.createElement("button");
-          botonSorpresaDiaria.textContent = "🎁 Mostrar tarjeta nueva";
-          botonSorpresaDiaria.id = "boton-sorpresa-diario";
-          botonSorpresaDiaria.style.margin = "1em auto";
-
-          botonSorpresaDiaria.onclick = async () => {
-            const tarjetasRef = collection(db, "tarjetas");
-            const tarjetasSnap = await getDocs(tarjetasRef);
-
-            const yaAbiertaHoy = tarjetasSnap.docs.some(doc => {
-              const data = doc.data();
-              if (!data.fechaDescubierta) return false;
-              const fecha = new Date(data.fechaDescubierta.toDate ? data.fechaDescubierta.toDate() : data.fechaDescubierta);
-              return (
-                fecha.getDate() === today.getDate() &&
-                fecha.getMonth() === today.getMonth() &&
-                fecha.getFullYear() === today.getFullYear()
-              );
-            });
-
-            const modoAdmin = localStorage.getItem("modoAdminCelebracion") === "true";
-
-            if (yaAbiertaHoy && !modoAdmin) {
-              botonSorpresaDiaria.style.display = "none";
-              const msg = document.createElement("p");
-              msg.innerText = "Ya has abierto una tarjeta hoy. Intenta mañana 😊";
-              document.getElementById("card-container").appendChild(msg);
-              return;
-            }
-
-            const candidatas = tarjetasSnap.docs.filter(doc => {
-              const data = doc.data();
-              return data.sorpresaPublica === true && !data.usada && data.visible && !data.descubierta;
-            });
-
-            if (candidatas.length === 0) {
-              const msg = document.createElement("p");
-              msg.innerText = "No hay tarjeta sorpresa disponible.";
-              document.getElementById("card-container").appendChild(msg);
-              return;
-            }
-
-            const elegida = candidatas[0];
-            await updateDoc(doc(db, "tarjetas", elegida.id), {
-              descubierta: true,
-              fechaDescubierta: new Date()
-            });
-
-            alert("¡Has desbloqueado una tarjeta sorpresa!");
-            cargarHistorial();
-          };
-
-          document.getElementById("card-container").appendChild(botonSorpresaDiaria);
-        }
-      }
-    }
-
     self.activarModoAdmin = () => {
       localStorage.setItem("modoAdminCelebracion", "true");
       alert("🔓 Modo administrador activado. Podrás abrir más de una tarjeta sorpresa.");
     };
 
-    document.addEventListener("DOMContentLoaded", () => {
-      controlarBotonDesdeFirebase();
+    document.addEventListener("DOMContentLoaded", async () => {
       cargarHistorial();
+
+      const contenedor = document.getElementById("card-container");
+
+      const botonSorpresaDiaria = document.createElement("button");
+      botonSorpresaDiaria.textContent = "🎁 Mostrar tarjeta nueva";
+      botonSorpresaDiaria.id = "boton-sorpresa-diario";
+      botonSorpresaDiaria.style.margin = "1em auto";
+
+      botonSorpresaDiaria.onclick = async () => {
+        const tarjetasRef = collection(db, "tarjetas");
+        const tarjetasSnap = await getDocs(tarjetasRef);
+
+        const yaAbiertaHoy = tarjetasSnap.docs.some(doc => {
+          const data = doc.data();
+          if (!data.fechaDescubierta) return false;
+          const fecha = new Date(data.fechaDescubierta.toDate ? data.fechaDescubierta.toDate() : data.fechaDescubierta);
+          return (
+            fecha.getDate() === today.getDate() &&
+            fecha.getMonth() === today.getMonth() &&
+            fecha.getFullYear() === today.getFullYear()
+          );
+        });
+
+        const modoAdmin = localStorage.getItem("modoAdminCelebracion") === "true";
+
+        if (yaAbiertaHoy && !modoAdmin) {
+          botonSorpresaDiaria.style.display = "none";
+          const msg = document.createElement("p");
+          msg.innerText = "Ya has abierto una tarjeta hoy. Intenta mañana 😊";
+          contenedor.appendChild(msg);
+          return;
+        }
+
+        const candidatas = tarjetasSnap.docs.filter(doc => {
+          const data = doc.data();
+          return (
+            data.sorpresaPublica === true &&
+            !data.usada &&
+            data.visible === true &&
+            data.descubierta !== true
+          );
+        });
+
+        if (candidatas.length === 0) {
+          if (!document.getElementById("no-sorpresa-msg")) {
+            const msg = document.createElement("p");
+            msg.id = "no-sorpresa-msg";
+            msg.innerText = "No hay tarjeta sorpresa disponible.";
+            contenedor.appendChild(msg);
+          }
+          return;
+        }
+
+        const elegida = candidatas[0];
+        await updateDoc(doc(db, "tarjetas", elegida.id), {
+          descubierta: true,
+          fechaDescubierta: new Date()
+        });
+
+        alert("¡Has desbloqueado una tarjeta sorpresa!");
+        cargarHistorial();
+      };
+
+      contenedor.appendChild(botonSorpresaDiaria);
     });
   </script>
   <style>

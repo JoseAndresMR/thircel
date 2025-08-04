@@ -152,8 +152,20 @@
       alert("🔓 Modo administrador activado. Podrás abrir más de una tarjeta sorpresa.");
     };
 
+    async function verificarMostrarSorpresa() {
+      const docRef = doc(db, "config", "general");
+      const snap = await getDoc(docRef);
+      if (snap.exists() && snap.data().mostrarBotonSorpresaPublico) {
+        const boton = document.createElement("button");
+        boton.textContent = "✨ Mostrar tarjeta sorpresa";
+        boton.onclick = mostrarTarjetaSorpresa;
+        document.getElementById("botones-superiores").appendChild(boton);
+      }
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       cargarHistorial();
+      verificarMostrarSorpresa();
     });
   </script>
   <style>
@@ -255,7 +267,6 @@
     <h1>🎉 31 Días de Celebración 🎉</h1>
     <div id="botones-superiores">
       <button onclick="mostrarTarjetaNueva()">🎁 Mostrar tarjeta nueva</button>
-      <button onclick="mostrarTarjetaSorpresa()">✨ Mostrar tarjeta sorpresa</button>
     </div>
   </div>
 

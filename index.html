@@ -4,237 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>31 Días de Celebración</title>
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-      import {
-        getFirestore,
-        doc,
-        getDoc,
-        getDocs,
-        updateDoc,
-        collection
-      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-      const firebaseConfig = {
-        apiKey: "AIzaSyBGZnLfG1w-2gipGRAVNqF2S9Zk7xsAePM",
-        authDomain: "diasdecelebracion-3783e.firebaseapp.com",
-        projectId: "diasdecelebracion-3783e",
-        storageBucket: "diasdecelebracion-3783e.appspot.com",
-        messagingSenderId: "230965566412",
-        appId: "1:230965566412:web:d6e1bb64654a9e60969b69"
-      };
-
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-
-      const hoyISO = () => new Date().toISOString().split("T")[0];
-      let modoAdmin = false;
-
-      function yaAbrioHoy(tipo) {
-        return localStorage.getItem("ultima" + tipo) === hoyISO();
-      }
-
-      async function verificarBotones() {
-        const configSnap = await getDoc(doc(db, "config", "general"));
-        const config = configSnap.data();
-
-        const botonSorpresa = document.getElementById("boton-sorpresa");
-        const botonNormal = document.getElementById("boton-normal");
-
-        if (config?.mostrarBotonSorpresaPublico) {
-          if (!yaAbrioHoy("Sorpresa") || modoAdmin) {
-            botonSorpresa.style.display = "inline-block";
-          } else {
-            botonSorpresa.style.display = "none";
-          }
-        } else {
-          botonSorpresa.style.display = "none";
-        }
-
-        if (!yaAbrioHoy("Normal") || modoAdmin) {
-          botonNormal.style.display = "inline-block";
-        } else {
-          botonNormal.style.display = "none";
-        }
-      }
-
-      window.activarModoAdmin = () => {
-        modoAdmin = true;
-        alert("Modo administrador activado.");
-        verificarBotones();
-      };
-
-      async function mostrarTarjeta(tipo) {
-        const tarjetasSnap = await getDocs(collection(db, "tarjetas"));
-        const hoy = hoyISO();
-        let encontrada = null;
-
-        for (const docu of tarjetasSnap.docs) {
-          const data = docu.data();
-          if (
-            !data.descubierta &&
-            !data.usada &&
-            data.visible &&
-            (tipo === "Sorpresa"
-              ? data.sorpresaPublica
-              : !data.sorpresaPublica && data.fechaDisponible <= hoy)
-          ) {
-            encontrada = { id: docu.id, ...data };
-            break;
-          }
-        }
-
-        if (encontrada) {
-          await updateDoc(doc(db, "tarjetas", encontrada.id), {
-            descubierta: true,
-            fechaDescubierta: new Date()
-          });
-          localStorage.setItem("ultima" + tipo, hoy);
-        } else {
-          alert(tipo === "Sorpresa"
-            ? "No hay tarjeta sorpresa disponible."
-            : "No hay tarjeta nueva disponible.");
-        }
-
-        cargarTarjetas();
-        verificarBotones();
-      }
-
-      function crearTarjetaHTML(data) {
-        const details = document.createElement("details");
-        details.className = "card-toggle tarjeta";
-        details.open = true;
-
-        const summary = document.createElement("summary");
-        summary.innerHTML = `<span class="summary-clickable">${data.titulo}</span>`;
-        details.appendChild(summary);
-
-        const div = document.createElement("div");
-        div.className = "card-content";
-        div.innerHTML = `
-          <div class="card-text">
-            <p>${data.descripcion}</p>
-            <p><strong>Estado:</strong> ${data.usada ? "✅ Usada" : "🕒 Pendiente"} ${!data.usada ? `<button onclick="marcarUsadaPorId('${data.id}')">Marcar como usada</button>` : ""}</p>
-          </div>
-          ${data.imagen ? `<img class="card-image" src="${data.imagen}" alt="Imagen tarjeta" />` : ""}
-        `;
-        details.appendChild(div);
-
-        return details;
-      }
-
-      async function cargarTarjetas() {
-        const tarjetasSnap = await getDocs(collection(db, "tarjetas"));
-        const lista = document.getElementById("tarjetas-lista");
-        const usadas = document.getElementById("tarjetas-usadas");
-        lista.innerHTML = "";
-        usadas.innerHTML = "";
-
-        tarjetasSnap.docs.forEach((docu) => {
-          const data = docu.data();
-          if (data.descubierta && data.visible) {
-            const card = crearTarjetaHTML({ id: docu.id, ...data });
-            if (data.usada) {
-              usadas.appendChild(card);
-            } else {
-              lista.appendChild(card);
-            }
-          }
-        });
-      }
-
-      window.marcarUsadaPorId = async (id) => {
-        await updateDoc(doc(db, "tarjetas", id), { usada: true });
-        alert("Tarjeta marcada como usada");
-        cargarTarjetas();
-      };
-
-      document.addEventListener("DOMContentLoaded", () => {
-        document.getElementById("boton-normal").addEventListener("click", () => mostrarTarjeta("Normal"));
-        document.getElementById("boton-sorpresa").addEventListener("click", () => mostrarTarjeta("Sorpresa"));
-        cargarTarjetas();
-        verificarBotones();
-      });
-    </script>
-    <style>
-      body {
-        font-family: sans-serif;
-        margin: 0;
-        padding: 0;
-        background: url("https://joseandresmr.github.io/thircel/img/fondo.png") no-repeat center center fixed;
-        background-size: cover;
-        text-align: center;
-      }
-      .header {
-        display: inline-block;
-        padding: 1.5em;
-        margin: 1em auto;
-        border-radius: 16px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-        background: rgba(255, 255, 255, 0.95);
-      }
-      .toggle-section {
-        max-width: 800px;
-        margin: 2em auto;
-        padding: 1em;
-        border-radius: 12px;
-        background: transparent;
-      }
-      details {
-        background: rgba(255, 255, 255, 0.75);
-        padding: 1em;
-        margin: 1em 0;
-        border-radius: 10px;
-      }
-      summary {
-        font-weight: bold;
-        font-size: 1.2em;
-        margin-bottom: 0.5em;
-        cursor: pointer;
-        list-style: none;
-      }
-      summary::-webkit-details-marker {
-        display: none;
-      }
-      .summary-clickable {
-        display: inline-block;
-        width: 100%;
-        cursor: pointer;
-      }
-      .card-content {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1em;
-        text-align: left;
-      }
-      .card-text {
-        flex: 1;
-      }
-      .card-image {
-        max-width: 120px;
-        border-radius: 12px;
-      }
-      button {
-        background: linear-gradient(to right, #f78ca0, #f9748f);
-        color: white;
-        border: none;
-        padding: 0.6em 1.2em;
-        border-radius: 10px;
-        cursor: pointer;
-        font-weight: bold;
-        transition: background 0.3s ease;
-        margin: 0.5em;
-      }
-      button:hover {
-        background: linear-gradient(to right, #f65c78, #f65175);
-      }
-      footer {
-        height: 100vh;
-        background: transparent;
-      }
-    </style>
+    <!-- Carga de estilos externos -->
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Carga de lógica JavaScript externa (ES Modules) -->
+    <script type="module" src="main.js"></script>
   </head>
   <body>
     <div class="header">
@@ -244,6 +17,7 @@
         <button id="boton-sorpresa">✨ Mostrar tarjeta sorpresa</button>
       </div>
     </div>
+
     <div class="toggle-section">
       <details open>
         <summary><span class="summary-clickable">🕒 Tarjetas pendientes</span></summary>
@@ -254,6 +28,10 @@
         <div id="tarjetas-usadas"></div>
       </details>
     </div>
+
+    <!-- Contenedor del modal para nuevas tarjetas -->
+    <div id="modal" style="display:none;"></div>
+
     <footer></footer>
   </body>
 </html>

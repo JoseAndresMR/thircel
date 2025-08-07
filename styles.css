@@ -1,84 +1,37 @@
-/* ——— Estilos globales ——— */
-body{
-  font-family:sans-serif;
-  margin:0; padding:0;
-  text-align:center;
-  background:url("https://joseandresmr.github.io/thircel/img/fondo.png") center/cover fixed no-repeat;
-}
+/* Layout dos columnas: calendario a la izquierda */
+.main-layout{ max-width:1100px; margin:0 auto; display:grid; grid-template-columns:330px 1fr; gap:16px; align-items:start; }
 
-/* ——— Encabezado ——— */
-.header{
-  display:inline-block;
-  padding:1.5em;
-  margin:1em auto;
+/* Tarjeta del calendario (fondo legible) */
+.calendar-card{
+  background:rgba(255,255,255,.92);
   border-radius:16px;
   box-shadow:0 6px 20px rgba(0,0,0,.15);
-  background:rgba(255,255,255,.95);
+  padding:12px;
+  position:sticky; top:10px;
 }
+.calendar-title{ font-weight:700; margin:4px 0 8px; text-transform:capitalize; }
 
-/* ——— Secciones desplegables ——— */
-.toggle-section{max-width:800px;margin:2em auto;padding:1em;border-radius:12px;background:transparent;}
+/* Grid del calendario */
+.calendar-grid{
+  display:grid; grid-template-columns:repeat(7,1fr); gap:6px;
+  background:rgba(255,255,255,.85);
+  border-radius:10px; padding:8px;
+}
+.cal-day{ padding:.4em 0; border-radius:6px; background:rgba(255,255,255,.6); text-align:center; }
+.cal-head{ font-weight:700; opacity:.8; }
 
-details{
-  background:rgba(255,255,255,.75);
-  padding:1em;margin:1em 0;border-radius:10px;
-}
-summary{font-weight:bold;font-size:1.2em;margin-bottom:.5em;cursor:pointer;list-style:none;}
-summary::-webkit-details-marker{display:none;}
-.summary-clickable{display:inline-block;width:100%;cursor:pointer;}
+/* Estados */
+.cal-day.today{ outline:2px solid #f9748f; font-weight:bold; }
+.cal-day.birthday{ background:#ffd54f; font-weight:bold; }
+.cal-day.released{ background:#a0d995; color:#000; }
+.cal-day.pendingPast{ background:#e0e0e0; color:#777; }
+.cal-day.upcoming{ background:#81d4fa; }
 
-/* ——— Tarjeta interna ——— */
-.card-content{display:flex;gap:1em;align-items:center;text-align:left;}
-.card-text{flex:1;}
-.card-image{max-width:120px;border-radius:12px;}
-
-/* ——— Botones ——— */
-button{
-  background:linear-gradient(to right,#f78ca0,#f9748f);
-  color:#fff;border:none;padding:.6em 1.2em;border-radius:10px;
-  cursor:pointer;font-weight:bold;transition:background .3s ease;margin:.5em;
-}
-button:hover{background:linear-gradient(to right,#f65c78,#f65175);}
-
-/* ——— Modal (nueva tarjeta) ——— */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;justify-content:center;align-items:center;z-index:1000;}
-.modal-box{background:#fff;padding:2em;border-radius:12px;max-width:500px;width:90%;box-shadow:0 4px 20px rgba(0,0,0,.3);position:relative;text-align:left;}
-.close-modal{position:absolute;top:10px;right:10px;width:32px;height:32px;border:none;border-radius:50%;background:#f65c78;color:#fff;font-weight:bold;cursor:pointer;}
-
-footer{height:100vh;background:transparent;}
-
-/* —— Calendario —— */
-#calendar-container{
-  max-width:330px;         /* ancho fijo tipo sidebar */
-  margin:0 auto 1.5em;     /* centrado */
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:4px;
-  font-size:.9rem;
-}
-
-.cal-day{
-  padding:.4em 0;
-  border-radius:6px;
-  background:rgba(255,255,255,.6);
-}
-
-.cal-day.today{            /* hoy */
-  outline:2px solid #f9748f;
-  font-weight:bold;
-}
-.cal-day.birthday{         /* día de cumpleaños */
-  background:#ffd54f;
-  font-weight:bold;
-}
-.cal-day.released{         /* día pasado y tarjeta descubierta */
-  background:#a0d995;
-  color:#000;
-}
-.cal-day.pendingPast{      /* día pasado sin tarjeta */
-  background:#e0e0e0;
-  color:#777;
-}
-.cal-day.upcoming{         /* futuro con tarjeta programada */
-  background:#81d4fa;
-}
+/* Leyenda */
+.calendar-legend{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; font-size:.8rem; justify-content:center; }
+.badge{ padding:2px 6px; border-radius:6px; background:rgba(255,255,255,.85); border:1px solid rgba(0,0,0,.08); }
+.badge.birthday{ background:#ffd54f; }
+.badge.released{ background:#a0d995; }
+.badge.pendingPast{ background:#e0e0e0; }
+.badge.upcoming{ background:#81d4fa; }
+.badge.today{ outline:2px solid #f9748f; }

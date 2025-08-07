@@ -46,3 +46,39 @@ button:hover{background:linear-gradient(to right,#f65c78,#f65175);}
 .close-modal{position:absolute;top:10px;right:10px;width:32px;height:32px;border:none;border-radius:50%;background:#f65c78;color:#fff;font-weight:bold;cursor:pointer;}
 
 footer{height:100vh;background:transparent;}
+
+/* —— Calendario —— */
+#calendar-container{
+  max-width:330px;         /* ancho fijo tipo sidebar */
+  margin:0 auto 1.5em;     /* centrado */
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:4px;
+  font-size:.9rem;
+}
+
+.cal-day{
+  padding:.4em 0;
+  border-radius:6px;
+  background:rgba(255,255,255,.6);
+}
+
+.cal-day.today{            /* hoy */
+  outline:2px solid #f9748f;
+  font-weight:bold;
+}
+.cal-day.birthday{         /* día de cumpleaños */
+  background:#ffd54f;
+  font-weight:bold;
+}
+.cal-day.released{         /* día pasado y tarjeta descubierta */
+  background:#a0d995;
+  color:#000;
+}
+.cal-day.pendingPast{      /* día pasado sin tarjeta */
+  background:#e0e0e0;
+  color:#777;
+}
+.cal-day.upcoming{         /* futuro con tarjeta programada */
+  background:#81d4fa;
+}

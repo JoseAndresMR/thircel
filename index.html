@@ -150,10 +150,10 @@
       };
 
       document.addEventListener("DOMContentLoaded", () => {
-        verificarBotones();
-        cargarTarjetas();
         document.getElementById("boton-normal").addEventListener("click", () => mostrarTarjeta("Normal"));
         document.getElementById("boton-sorpresa").addEventListener("click", () => mostrarTarjeta("Sorpresa"));
+        cargarTarjetas();
+        verificarBotones();
       });
     </script>
     <style>

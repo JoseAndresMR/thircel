@@ -4,9 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>31 Días de Celebración</title>
-    <!-- Carga de estilos externos -->
     <link rel="stylesheet" href="styles.css" />
-    <!-- Carga de lógica JavaScript externa (ES Modules) -->
     <script type="module" src="main.js"></script>
   </head>
   <body>
@@ -18,21 +16,24 @@
       </div>
     </div>
 
-    <!-- Contenedor del calendario -->
-    <div id="calendar-container"></div>
+    <div class="main-layout">
+      <!-- Calendario lateral -->
+      <aside id="calendar-container"></aside>
 
-    <div class="toggle-section">
-      <details open>
-        <summary><span class="summary-clickable">🕒 Tarjetas pendientes</span></summary>
-        <div id="tarjetas-lista"></div>
-      </details>
-      <details open>
-        <summary><span class="summary-clickable">✅ Tarjetas usadas</span></summary>
-        <div id="tarjetas-usadas"></div>
-      </details>
+      <!-- Listas de tarjetas -->
+      <section class="toggle-section">
+        <details>
+          <summary><span class="summary-clickable">🕒 Tarjetas pendientes</span></summary>
+          <div id="tarjetas-lista"></div>
+        </details>
+        <details>
+          <summary><span class="summary-clickable">✅ Tarjetas usadas</span></summary>
+          <div id="tarjetas-usadas"></div>
+        </details>
+      </section>
     </div>
 
-    <!-- Contenedor del modal para nuevas tarjetas -->
+    <!-- Modal de tarjeta recién descubierta -->
     <div id="modal" style="display:none;"></div>
 
     <footer></footer>

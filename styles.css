@@ -1,4 +1,4 @@
-/* —— Global —— */
+/* ===== Global ===== */
 body{
   font-family:sans-serif;
   margin:0; padding:0;
@@ -6,7 +6,7 @@ body{
   background:url("https://joseandresmr.github.io/thircel/img/fondo.png") center/cover fixed no-repeat;
 }
 
-/* —— Header —— */
+/* ===== Header ===== */
 .header{
   display:inline-block;
   padding:1.5em;
@@ -16,14 +16,13 @@ body{
   background:rgba(255,255,255,.95);
 }
 
-/* —— Listas de tarjetas —— */
+/* ===== Listas ===== */
 .toggle-section{
   background:transparent;
   padding:0 4px;
-  max-width:800px;         /* centrado y ancho cómodo */
-  margin:0 auto 2rem;      /* el calendario no empuja, esto queda centrado */
+  max-width:800px;           /* centrado y ancho cómodo */
+  margin:0 auto 2rem;        /* el calendario no empuja, queda centrado */
 }
-
 details{
   background:rgba(255,255,255,.75);
   padding:1em;
@@ -44,7 +43,7 @@ summary::-webkit-details-marker{display:none;}
 .card-text{flex:1;}
 .card-image{max-width:120px;border-radius:12px;}
 
-/* —— Botones —— */
+/* ===== Botones ===== */
 button{
   background:linear-gradient(to right,#f78ca0,#f9748f);
   color:#fff;border:none;padding:.6em 1.2em;border-radius:10px;
@@ -52,28 +51,34 @@ button{
 }
 button:hover{background:linear-gradient(to right,#f65c78,#f65175);}
 
-/* —— Modal —— */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;justify-content:center;align-items:center;z-index:1000;}
-.modal-box{background:#fff;padding:2em;border-radius:12px;max-width:520px;width:90%;box-shadow:0 4px 20px rgba(0,0,0,.3);position:relative;text-align:left;}
-.close-modal{position:absolute;top:10px;right:10px;width:32px;height:32px;border:none;border-radius:50%;background:#f65c78;color:#fff;font-weight:bold;cursor:pointer;}
+/* ===== Modal ===== */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  display:flex;justify-content:center;align-items:center;z-index:1000;
+}
+.modal-box{
+  background:#fff;padding:2em;border-radius:12px;max-width:520px;width:90%;
+  box-shadow:0 4px 20px rgba(0,0,0,.3);position:relative;text-align:left;
+}
+.close-modal{
+  position:absolute;top:10px;right:10px;width:32px;height:32px;
+  border:none;border-radius:50%;background:#f65c78;color:#fff;font-weight:bold;cursor:pointer;
+}
 
-/* —— Calendario como sidebar fijo a la derecha —— */
+/* ===== Calendario: sidebar fijo a la derecha ===== */
 #calendar-container{
   position:fixed;
   right:16px;
-  top:120px;             /* se reajusta por JS para quedar bajo el header */
+  top:120px;                 /* se reajusta por JS para quedar bajo el header */
   width:320px;
   z-index:50;
 }
-
-/* Tarjeta visual del calendario */
 .calendar-card{
   background:rgba(255,255,255,.92);
   border-radius:16px;
   box-shadow:0 6px 20px rgba(0,0,0,.15);
   padding:12px;
 }
-
 .calendar-title{font-weight:700;margin:4px 0 8px;text-transform:capitalize;}
 
 .calendar-grid{
@@ -84,7 +89,7 @@ button:hover{background:linear-gradient(to right,#f65c78,#f65175);}
 .cal-day{padding:.4em 0;border-radius:6px;background:rgba(255,255,255,.6);text-align:center;}
 .cal-head{font-weight:700;opacity:.8;}
 
-/* Estados */
+/* Estados de día */
 .cal-day.today{outline:2px solid #f9748f;font-weight:bold;}
 .cal-day.birthday{background:#ffd54f;font-weight:bold;}
 .cal-day.released{background:#a0d995;color:#000;}
@@ -102,13 +107,10 @@ button:hover{background:linear-gradient(to right,#f65c78,#f65175);}
 .badge.upcoming{background:#81d4fa;}
 .badge.today{outline:2px solid #f9748f;}
 
-/* Responsive: en pantallas estrechas, el calendario baja */
+/* (Opcional) Si quieres que en móviles el calendario baje debajo del header, descomenta esto
 @media (max-width: 1200px){
-  #calendar-container{
-    position:static;
-    width:auto;
-    margin:0 auto 1.5rem;
-  }
+  #calendar-container{ position:static; width:auto; margin:0 auto 1.5rem; }
 }
+*/
 
 footer{height:100vh;background:transparent;}

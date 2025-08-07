@@ -26,12 +26,10 @@ const today = new Date();
 const YEAR = today.getFullYear();
 
 /** Periodo de celebración: del 10 de agosto (incl.) durante 31 días */
-const CELEB_START = new Date(YEAR, 7, 10); // 7 = agosto (0-based)
-const CELEB_DAYS  = 31;
+const CELEB_START = new Date(YEAR, 7, 10); // <-- cumple y primer día (10-ago)
+const CELEB_DAYS  = 31;                    // 31 días a partir del cumple
+const BIRTHDAY    = new Date(CELEB_START); // el cumple ES el día 1
 
-/** Día de cumpleaños (cámbialo si hace falta) */
-const BIRTHDAY_DAY = 18;
-const BIRTHDAY     = new Date(YEAR, 7, BIRTHDAY_DAY);
 
 /** Helpers de fecha */
 const pad2 = n => String(n).padStart(2,'0');

@@ -5,11 +5,19 @@ import {
   updateDoc, collection
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const firebaseConfig = { /* …tus credenciales… */ };
+const firebaseConfig = {
+  apiKey: "AIzaSyBGZnLfG1w-2gipGRAVNqF2S9Zk7xsAePM",
+  authDomain: "diasdecelebracion-3783e.firebaseapp.com",
+  projectId: "diasdecelebracion-3783e",
+  storageBucket: "diasdecelebracion-3783e.appspot.com",
+  messagingSenderId: "230965566412",
+  appId: "1:230965566412:web:d6e1bb64654a9e60969b69"
+};
+
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
-/* -------- Utilidades ---------- */
+/* -------- utilidades y resto del código (sin cambios) ---------- */
 const hoyISO = () => new Date().toISOString().split("T")[0];
 let modoAdmin = false;
 

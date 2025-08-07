@@ -124,16 +124,15 @@ async function mostrarTarjeta(tipo){
   if(!card){
     alert(tipo==="Sorpresa" ? "No hay tarjeta sorpresa disponible."
                             : "No hay tarjeta nueva disponible.");
-    return;
+  }else{
+    await updateDoc(doc(db,"tarjetas",card.id),{
+      descubierta:true,
+      fechaDescubierta:new Date()
+    });
+    localStorage.setItem("ultima"+tipo, hoy);
+    showModal(card);
   }
 
-  await updateDoc(doc(db,"tarjetas",card.id),{
-    descubierta:true,
-    fechaDescubierta:new Date()
-  });
-  localStorage.setItem("ultima"+tipo, hoy);
-
-  showModal(card);
   verificarBotones();
 }
 window.mostrarTarjeta = mostrarTarjeta;
@@ -207,7 +206,7 @@ function renderCalendar(releasedSet, upcomingSet){
   const wrapper = document.getElementById("calendar-container");
   if (!wrapper) return;
 
-  // Crear estructura si no existe
+  // Construye estructura si no existe
   if (!document.getElementById("calendar-title")){
     wrapper.innerHTML = `
       <div class="calendar-card">
@@ -260,7 +259,26 @@ function renderCalendar(releasedSet, upcomingSet){
 
     cal.appendChild(cell);
   }
+
+  positionCalendarSidebar();
 }
+
+/* Sidebar: coloca el calendario justo bajo el header (en desktop) */
+function positionCalendarSidebar(){
+  const cal = document.getElementById("calendar-container");
+  const header = document.querySelector(".header");
+  if (!cal || !header) return;
+
+  if (window.innerWidth > 1200){
+    const rect = header.getBoundingClientRect();
+    const top = rect.bottom + window.scrollY + 12;
+    cal.style.top = `${top}px`;
+  } else {
+    cal.style.top = ""; // reset en móviles
+  }
+}
+window.addEventListener("resize", positionCalendarSidebar);
+window.addEventListener("scroll", positionCalendarSidebar);
 
 /* ===========================
    Arranque
@@ -269,7 +287,8 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   document.getElementById("boton-normal").onclick   = ()=>mostrarTarjeta("Normal");
   document.getElementById("boton-sorpresa").onclick = ()=>mostrarTarjeta("Sorpresa");
 
-  await loadConfig();      // ← lee fechaInicio, diasCelebracion, sorpresa desde Firestore
+  await loadConfig();      // lee fechaInicio, diasCelebracion, sorpresa
   cargarTarjetas();
   verificarBotones();
+  positionCalendarSidebar();
 });

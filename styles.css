@@ -1,0 +1,48 @@
+/* ——— Estilos globales ——— */
+body{
+  font-family:sans-serif;
+  margin:0; padding:0;
+  text-align:center;
+  background:url("https://joseandresmr.github.io/thircel/img/fondo.png") center/cover fixed no-repeat;
+}
+
+/* ——— Encabezado ——— */
+.header{
+  display:inline-block;
+  padding:1.5em;
+  margin:1em auto;
+  border-radius:16px;
+  box-shadow:0 6px 20px rgba(0,0,0,.15);
+  background:rgba(255,255,255,.95);
+}
+
+/* ——— Secciones desplegables ——— */
+.toggle-section{max-width:800px;margin:2em auto;padding:1em;border-radius:12px;background:transparent;}
+
+details{
+  background:rgba(255,255,255,.75);
+  padding:1em;margin:1em 0;border-radius:10px;
+}
+summary{font-weight:bold;font-size:1.2em;margin-bottom:.5em;cursor:pointer;list-style:none;}
+summary::-webkit-details-marker{display:none;}
+.summary-clickable{display:inline-block;width:100%;cursor:pointer;}
+
+/* ——— Tarjeta interna ——— */
+.card-content{display:flex;gap:1em;align-items:center;text-align:left;}
+.card-text{flex:1;}
+.card-image{max-width:120px;border-radius:12px;}
+
+/* ——— Botones ——— */
+button{
+  background:linear-gradient(to right,#f78ca0,#f9748f);
+  color:#fff;border:none;padding:.6em 1.2em;border-radius:10px;
+  cursor:pointer;font-weight:bold;transition:background .3s ease;margin:.5em;
+}
+button:hover{background:linear-gradient(to right,#f65c78,#f65175);}
+
+/* ——— Modal (nueva tarjeta) ——— */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;justify-content:center;align-items:center;z-index:1000;}
+.modal-box{background:#fff;padding:2em;border-radius:12px;max-width:500px;width:90%;box-shadow:0 4px 20px rgba(0,0,0,.3);position:relative;text-align:left;}
+.close-modal{position:absolute;top:10px;right:10px;width:32px;height:32px;border:none;border-radius:50%;background:#f65c78;color:#fff;font-weight:bold;cursor:pointer;}
+
+footer{height:100vh;background:transparent;}

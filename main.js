@@ -21,9 +21,9 @@ const db  = getFirestore(app);
 /* ===========================
    Utils y estado global
 =========================== */
-const pad2 = n => String(n).padStart(2, "0");
-const toISODate = d => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
-const hoyISO = () => toISODate(new Date());
+const pad2       = n => String(n).padStart(2, "0");
+const toISODate  = d => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+const hoyISO     = () => toISODate(new Date());
 
 let modoAdmin = false;
 let CONFIG = {
@@ -48,10 +48,10 @@ async function loadConfig() {
 }
 
 /* Helpers dependientes de CONFIG */
-const startDate  = () => new Date(CONFIG.start); // primer día (cumple)
-const endDate    = () => { const e=new Date(CONFIG.start); e.setDate(e.getDate()+CONFIG.days-1); return e; };
+const startDate   = () => new Date(CONFIG.start); // primer día (cumple)
+const endDate     = () => { const e=new Date(CONFIG.start); e.setDate(e.getDate()+CONFIG.days-1); return e; };
 const birthdayISO = () => toISODate(startDate());
-const inRange = d => {
+const inRange     = d => {
   const dd = new Date(d.getFullYear(), d.getMonth(), d.getDate());
   return dd >= startDate() && dd <= endDate();
 };
@@ -96,7 +96,7 @@ function showModal(card){
 window.closeModal = (ev)=>{
   if(ev) ev.stopPropagation();
   document.getElementById("modal").style.display = "none";
-  cargarTarjetas(); // refresca listas y calendario al cerrar
+  cargarTarjetas(); // refresca listas y calendario
 };
 
 /* ===========================
@@ -190,13 +190,15 @@ async function cargarTarjetas(){
 
   renderCalendar(releasedSet, upcomingSet);
 }
+
+/* Marcar usada */
 window.marcarUsadaPorId = async id=>{
   await updateDoc(doc(db,"tarjetas",id),{usada:true});
   cargarTarjetas();
 };
 
 /* ===========================
-   Calendario lateral
+   Calendario (sidebar)
 =========================== */
 function monthNameES(date){
   return date.toLocaleDateString("es-ES",{month:"long", year:"numeric"});
@@ -223,11 +225,11 @@ function renderCalendar(releasedSet, upcomingSet){
   }
 
   const titleEl = document.getElementById("calendar-title");
-  const cal = document.getElementById("calendar-grid");
+  const cal     = document.getElementById("calendar-grid");
   titleEl.textContent = monthNameES(startDate());
   cal.innerHTML = "";
 
-  // cabeceras L-D
+  // Cabeceras L-D
   ["L","M","X","J","V","S","D"].forEach(h=>{
     const hd = document.createElement("div");
     hd.className = "cal-day cal-head";
@@ -246,13 +248,13 @@ function renderCalendar(releasedSet, upcomingSet){
     cell.className = "cal-day";
     cell.textContent = d.getDate();
 
-    if (iso === todayIso) cell.classList.add("today");
-    if (iso === birthdayISO()) cell.classList.add("birthday"); // cumple = fechaInicio
+    if (iso === todayIso)         cell.classList.add("today");
+    if (iso === birthdayISO())    cell.classList.add("birthday"); // cumple = fechaInicio
 
     const past = new Date(iso) < new Date(todayIso);
     if (past){
       if (releasedSet.has(iso)) cell.classList.add("released");
-      else cell.classList.add("pendingPast");
+      else                      cell.classList.add("pendingPast");
     } else {
       if (upcomingSet.has(iso)) cell.classList.add("upcoming");
     }
@@ -269,13 +271,9 @@ function positionCalendarSidebar(){
   const header = document.querySelector(".header");
   if (!cal || !header) return;
 
-  if (window.innerWidth > 1200){
-    const rect = header.getBoundingClientRect();
-    const top = rect.bottom + window.scrollY + 12;
-    cal.style.top = `${top}px`;
-  } else {
-    cal.style.top = ""; // reset en móviles
-  }
+  // si quieres que siempre esté fijo, no checks de ancho
+  const top = header.offsetTop + header.offsetHeight + 12;
+  cal.style.top = `${top}px`;
 }
 window.addEventListener("resize", positionCalendarSidebar);
 window.addEventListener("scroll", positionCalendarSidebar);

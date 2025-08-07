@@ -16,23 +16,16 @@ body{
   background:rgba(255,255,255,.95);
 }
 
-/* —— Layout: calendario + listas —— */
-.main-layout{
-  max-width:1100px;
-  margin:0 auto 2rem;
-  display:grid;
-  grid-template-columns:330px 1fr;
-  gap:16px;
-  align-items:start;
+/* —— Listas de tarjetas —— */
+.toggle-section{
+  background:transparent;
+  padding:0 4px;
+  max-width:800px;         /* centrado y ancho cómodo */
+  margin:0 auto 2rem;      /* el calendario no empuja, esto queda centrado */
 }
 
-/* —— Secciones de tarjetas —— */
-.toggle-section{
-  background:transparent;                  /* lo querías transparente */
-  padding:0 4px;
-}
 details{
-  background:rgba(255,255,255,.75);       /* un poco más transparente */
+  background:rgba(255,255,255,.75);
   padding:1em;
   margin:1em 0;
   border-radius:10px;
@@ -47,9 +40,7 @@ summary{
 summary::-webkit-details-marker{display:none;}
 .summary-clickable{display:inline-block;width:100%;cursor:pointer;}
 
-.card-content{
-  display:flex;gap:1em;align-items:center;text-align:left;
-}
+.card-content{display:flex;gap:1em;align-items:center;text-align:left;}
 .card-text{flex:1;}
 .card-image{max-width:120px;border-radius:12px;}
 
@@ -66,14 +57,23 @@ button:hover{background:linear-gradient(to right,#f65c78,#f65175);}
 .modal-box{background:#fff;padding:2em;border-radius:12px;max-width:520px;width:90%;box-shadow:0 4px 20px rgba(0,0,0,.3);position:relative;text-align:left;}
 .close-modal{position:absolute;top:10px;right:10px;width:32px;height:32px;border:none;border-radius:50%;background:#f65c78;color:#fff;font-weight:bold;cursor:pointer;}
 
-/* —— Calendario —— */
+/* —— Calendario como sidebar fijo a la derecha —— */
+#calendar-container{
+  position:fixed;
+  right:16px;
+  top:120px;             /* se reajusta por JS para quedar bajo el header */
+  width:320px;
+  z-index:50;
+}
+
+/* Tarjeta visual del calendario */
 .calendar-card{
   background:rgba(255,255,255,.92);
   border-radius:16px;
   box-shadow:0 6px 20px rgba(0,0,0,.15);
   padding:12px;
-  position:sticky; top:10px;
 }
+
 .calendar-title{font-weight:700;margin:4px 0 8px;text-transform:capitalize;}
 
 .calendar-grid{
@@ -84,7 +84,7 @@ button:hover{background:linear-gradient(to right,#f65c78,#f65175);}
 .cal-day{padding:.4em 0;border-radius:6px;background:rgba(255,255,255,.6);text-align:center;}
 .cal-head{font-weight:700;opacity:.8;}
 
-/* Estados de día */
+/* Estados */
 .cal-day.today{outline:2px solid #f9748f;font-weight:bold;}
 .cal-day.birthday{background:#ffd54f;font-weight:bold;}
 .cal-day.released{background:#a0d995;color:#000;}
@@ -101,5 +101,14 @@ button:hover{background:linear-gradient(to right,#f65c78,#f65175);}
 .badge.pendingPast{background:#e0e0e0;}
 .badge.upcoming{background:#81d4fa;}
 .badge.today{outline:2px solid #f9748f;}
+
+/* Responsive: en pantallas estrechas, el calendario baja */
+@media (max-width: 1200px){
+  #calendar-container{
+    position:static;
+    width:auto;
+    margin:0 auto 1.5rem;
+  }
+}
 
 footer{height:100vh;background:transparent;}

@@ -188,20 +188,22 @@ async function cargarTarjetas(){
   const upcomingSet = new Set();  // futuras (normales) dentro del rango
   const counts = { recibidas: 0, usadas: 0 };
 
-  snap.docs.forEach(d=>{
-    const x = d.data();
-    if (x.visible) counts.recibidas++;
+  snap.docs.forEach(d => {
+     const x = d.data();
+     // Contamos solo las tarjetas visibles y descubiertas
+     if (x.visible && x.descubierta) counts.recibidas++;
+   
+     // Listas de tarjetas descubiertas
+     if (!x.descubierta || !x.visible) return;
+     const card = crearTarjetaHTML({id: d.id, ...x});
+     if (x.usada) {
+       counts.usadas++;
+       used.appendChild(card);
+     } else {
+       pend.appendChild(card);
+     }
+   });
 
-    // Listas de tarjetas descubiertas
-    if(!x.descubierta || !x.visible) return;
-    const card = crearTarjetaHTML({id:d.id, ...x});
-    if (x.usada){
-      counts.usadas++;
-      used.appendChild(card);
-    } else {
-      pend.appendChild(card);
-    }
-  });
 
   renderStats(counts);
   renderCalendar(releasedSet, upcomingSet);

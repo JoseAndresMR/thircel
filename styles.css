@@ -64,7 +64,7 @@ summary::-webkit-details-marker{display:none;}
 .card-content{display:flex;gap:1em;align-items:center;text-align:left;}
 .card-text{flex:1;}
 .card-image {
-  max-width: 120px;
+  max-width: 240px;  /* Puedes poner el tamaño que prefieras */
   border-radius: 12px;
 }
 

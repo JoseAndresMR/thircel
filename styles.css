@@ -73,43 +73,6 @@ button{
 }
 button:hover{background:linear-gradient(to right,#f65c78,#f65175);}
 
-/* ===== Modal de entrada ===== */
-.entrada-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-  z-index: 1001;
-  padding: 2rem;
-  max-width: 90%;
-  width: 400px;
-}
-
-.entrada-modal-box {
-  position: relative;
-  text-align: center;
-}
-
-.entrada-modal .close-modal {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  border: none;
-  background-color: transparent;
-  color: #f9748f;
-  font-size: 1.5em;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-#entrada-mensaje {
-  font-size: 1.2em;
-  color: #333;
-}
-
 /* ===== Modal ===== */
 .modal-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,.6);

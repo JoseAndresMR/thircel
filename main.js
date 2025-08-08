@@ -158,37 +158,17 @@ function crearTarjetaHTML(t){
   return el;
 }
 
-function renderStats(counts, releasedSet, upcomingSet){
+function renderStats(counts){
   const el = document.getElementById("stats-container");
   if(!el) return;
 
-  const { visibles, descubiertas, usadas, pendientes, sorpDesc, sorpPend } = counts;
+  const { usadas, recibidas } = counts;
 
   el.innerHTML = `
     <div class="stats-card">
       <div class="stats-title">📊 Estadísticas</div>
-
-      <div class="stat-row"><span>Total visibles</span><strong>${visibles}</strong></div>
-
-      <div class="stat-row"><span>Descubiertas</span><strong>${descubiertas}</strong></div>
-      <div class="progress"><span style="width:${(descubiertas/visibles)*100}%"></span></div>
-
+      <div class="stat-row"><span>Total recibidas</span><strong>${recibidas}</strong></div>
       <div class="stat-row"><span>Usadas</span><strong>${usadas}</strong></div>
-      <div class="progress"><span style="width:${(usadas/descubiertas)*100}%"></span></div>
-
-      <div class="stat-row"><span>Pendientes (sin usar)</span><strong>${pendientes}</strong></div>
-
-      <hr style="border:none;border-top:1px solid #eee;margin:.75em 0;" />
-
-      <div class="stat-row"><span>Sorpresas descubiertas</span><strong>${sorpDesc}</strong></div>
-      <div class="stat-row"><span>Sorpresas pendientes</span><strong>${sorpPend}</strong></div>
-
-      <hr style="border:none;border-top:1px solid #eee;margin:.75em 0;" />
-
-      <div class="stat-row"><span>Liberadas en el periodo</span><strong>${releasedSet.size}</strong></div>
-      <div class="progress"><span style="width:${(releasedSet.size/CONFIG.days)*100}%"></span></div>
-
-      <div class="stat-row"><span>Próximas (normales)</span><strong>${upcomingSet.size}</strong></div>
     </div>
   `;
 }
@@ -202,31 +182,11 @@ async function cargarTarjetas(){
   // Conjuntos para calendario y contadores para stats
   const releasedSet = new Set();  // fechas descubiertas dentro del rango
   const upcomingSet = new Set();  // futuras (normales) dentro del rango
-  const counts = { visibles:0, descubiertas:0, usadas:0, pendientes:0, sorpDesc:0, sorpPend:0 };
+  const counts = { recibidas: 0, usadas: 0 };
 
   snap.docs.forEach(d=>{
     const x = d.data();
-    if (x.visible) counts.visibles++;
-
-    // Stats de sorpresas
-    if (x.sorpresaPublica){
-      if (x.descubierta) counts.sorpDesc++; else counts.sorpPend++;
-    }
-
-    // Marcas para calendario
-    if (x.descubierta) {
-      counts.descubiertas++;
-      let f = null;
-      if (x.fechaDescubierta?.toDate) f = x.fechaDescubierta.toDate();
-      else if (typeof x.fechaDescubierta === "string") f = new Date(x.fechaDescubierta);
-      else if (x.fechaDisponible) f = new Date(x.fechaDisponible);
-      if (f && inRange(f)) releasedSet.add(toISODate(f));
-    } else {
-      if (x.visible && !x.sorpresaPublica && x.fechaDisponible) {
-        const f = new Date(x.fechaDisponible);
-        if (inRange(f)) upcomingSet.add(toISODate(f));
-      }
-    }
+    if (x.visible) counts.recibidas++;
 
     // Listas de tarjetas descubiertas
     if(!x.descubierta || !x.visible) return;
@@ -235,12 +195,11 @@ async function cargarTarjetas(){
       counts.usadas++;
       used.appendChild(card);
     } else {
-      counts.pendientes++;
       pend.appendChild(card);
     }
   });
 
-  renderStats(counts, releasedSet, upcomingSet);
+  renderStats(counts);
   renderCalendar(releasedSet, upcomingSet);
 }
 
@@ -271,7 +230,6 @@ function renderCalendar(releasedSet, upcomingSet){
           <span class="badge birthday">Cumple</span>
           <span class="badge released">Liberada</span>
           <span class="badge pendingPast">Pasado sin tarjeta</span>
-          <span class="badge upcoming">Próxima</span>
           <span class="badge today">Hoy</span>
         </div>
       </div>`;
@@ -308,8 +266,6 @@ function renderCalendar(releasedSet, upcomingSet){
     if (past){
       if (releasedSet.has(iso)) cell.classList.add("released");
       else                      cell.classList.add("pendingPast");
-    } else {
-      if (upcomingSet.has(iso)) cell.classList.add("upcoming");
     }
 
     cal.appendChild(cell);

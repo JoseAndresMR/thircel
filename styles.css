@@ -1,4 +1,8 @@
 /* ===== Global ===== */
+:root{
+  --sticky-top: 96px; /* se recalcula por JS con la altura real del header */
+}
+
 body{
   font-family:sans-serif;
   margin:0; padding:0;
@@ -16,13 +20,31 @@ body{
   background:rgba(255,255,255,.95);
 }
 
-/* ===== Listas ===== */
+/* ===== Página de 3 columnas: stats | tarjetas | calendario ===== */
+.page{
+  max-width: 1400px;              /* 280 + 800 + 320 = 1400 */
+  margin: 0 auto 2rem;
+  display: grid;
+  grid-template-columns: 280px minmax(320px, 800px) 320px;
+  gap: 16px;
+  align-items: start;
+}
+
+/* Sidebars que “hacen roll” con el contenido */
+.sidebar{
+  position: sticky;
+  top: var(--sticky-top);
+  align-self: start;
+}
+
+/* ===== Tarjetas ===== */
 .toggle-section{
   background:transparent;
   padding:0 4px;
-  max-width:800px;           /* centrado y ancho cómodo */
-  margin:0 auto 2rem;        /* el calendario no empuja, queda centrado */
+  max-width:800px;
+  margin:0 auto;
 }
+
 details{
   background:rgba(255,255,255,.75);
   padding:1em;
@@ -65,14 +87,7 @@ button:hover{background:linear-gradient(to right,#f65c78,#f65175);}
   border:none;border-radius:50%;background:#f65c78;color:#fff;font-weight:bold;cursor:pointer;
 }
 
-/* ===== Calendario: sidebar fijo a la derecha ===== */
-#calendar-container{
-  position:fixed;
-  right:16px;
-  top:120px;                 /* se reajusta por JS para quedar bajo el header */
-  width:320px;
-  z-index:50;
-}
+/* ===== Calendario ===== */
 .calendar-card{
   background:rgba(255,255,255,.92);
   border-radius:16px;
@@ -96,7 +111,7 @@ button:hover{background:linear-gradient(to right,#f65c78,#f65175);}
 .cal-day.pendingPast{background:#e0e0e0;color:#777;}
 .cal-day.upcoming{background:#81d4fa;}
 
-/* Leyenda */
+/* Leyenda calendario */
 .calendar-legend{
   display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:.8rem;justify-content:center;
 }
@@ -107,10 +122,28 @@ button:hover{background:linear-gradient(to right,#f65c78,#f65175);}
 .badge.upcoming{background:#81d4fa;}
 .badge.today{outline:2px solid #f9748f;}
 
-/* (Opcional) Si quieres que en móviles el calendario baje debajo del header, descomenta esto
-@media (max-width: 1200px){
-  #calendar-container{ position:static; width:auto; margin:0 auto 1.5rem; }
+/* ===== Stats (sidebar izquierda) ===== */
+.stats-card{
+  background:rgba(255,255,255,.92);
+  border-radius:16px;
+  box-shadow:0 6px 20px rgba(0,0,0,.15);
+  padding:12px;
+  text-align:left;
 }
-*/
+.stats-title{font-weight:700;margin:4px 0 8px;}
+.stat-row{display:flex;justify-content:space-between;margin:.35em 0;}
+.progress{
+  height:8px;border-radius:6px;background:#eee;overflow:hidden;margin:.25em 0 .75em;
+}
+.progress > span{
+  display:block;height:100%;background:#f9748f; /* barra principal */
+}
+
+/* ===== Responsive: en móviles apilamos columnas ===== */
+@media (max-width: 1100px){
+  .page{ grid-template-columns: 1fr; }
+  .sidebar{ position: static; }
+  #stats-container, #calendar-container{ margin: 0 16px; }
+}
 
 footer{height:100vh;background:transparent;}

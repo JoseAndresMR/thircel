@@ -1,15 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, getDoc, getDocs, updateDoc, collection } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  getDocs,
-  updateDoc,
-  collection
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyBGZnLfG1w-2gipGRAVNqF2S9Zk7xsAePM",
   authDomain: "diasdecelebracion-3783e.firebaseapp.com",
@@ -19,13 +11,11 @@ const firebaseConfig = {
   appId: "1:230965566412:web:d6e1bb64654a9e60969b69"
 };
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db  = getFirestore(app);
 
-/* ===========================
-   Utils y estado global
-=========================== */
+// Utils y estado global
 const pad2 = n => String(n).padStart(2, "0");
-const toISODate = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+const toISODate = d => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
 const hoyISO = () => toISODate(new Date());
 
 let modoAdmin = false;
@@ -35,7 +25,7 @@ let CONFIG = {
   showSorpresa: false   // Boolean: config/general.mostrarBotonSorpresaPublico
 };
 
-/* Carga configuración desde Firestore */
+// Carga configuración desde Firestore
 async function loadConfig() {
   const snap = await getDoc(doc(db, "config", "general"));
   if (snap.exists()) {
@@ -51,7 +41,7 @@ async function loadConfig() {
   }
 }
 
-/* Helpers dependientes de CONFIG */
+// Helpers dependientes de CONFIG
 const startDate = () => new Date(CONFIG.start); // primer día (cumple)
 const endDate = () => {
   const e = new Date(CONFIG.start);
@@ -64,9 +54,9 @@ const inRange = d => {
   return dd >= startDate() && dd <= endDate();
 };
 
-/* ===========================
-   Control de botones
-=========================== */
+// ===========================
+// Control de botones
+===========================
 function yaAbrioHoy(tipo) { return localStorage.getItem("ultima" + tipo) === hoyISO(); }
 
 function verificarBotones() {
@@ -85,13 +75,13 @@ window.activarModoAdmin = () => {
   verificarBotones();
 };
 
-/* ===========================
-   Modal emergente
-=========================== */
+// ===========================
+// Modal emergente
+===========================
 function showModal(card) {
   const modal = document.getElementById("modal");
   modal.innerHTML = `
-    <div class="modal-overlay active" onclick="closeModal(event)">
+    <div class="modal-overlay" onclick="closeModal(event)">
       <div class="modal-box" onclick="event.stopPropagation()">
         <button class="close-modal" onclick="closeModal()">✖</button>
         <h2>${card.titulo}</h2>
@@ -105,16 +95,15 @@ function showModal(card) {
   const audio = new Audio('https://www.soundjay.com/button/beep-07.wav');
   audio.play();
 }
-
 window.closeModal = (ev) => {
   if (ev) ev.stopPropagation();
   document.getElementById("modal").style.display = "none";
   cargarTarjetas(); // refresca listas y calendario y stats
 };
 
-/* ===========================
-   Descubrir tarjeta (normal/sorpresa)
-=========================== */
+// ===========================
+// Descubrir tarjeta (normal/sorpresa)
+===========================
 async function mostrarTarjeta(tipo) {
   const snap = await getDocs(collection(db, "tarjetas"));
   const hoy = hoyISO();
@@ -150,9 +139,9 @@ async function mostrarTarjeta(tipo) {
 }
 window.mostrarTarjeta = mostrarTarjeta;
 
-/* ===========================
-   Listado de tarjetas + Stats
-=========================== */
+// ===========================
+// Listado de tarjetas + Stats
+===========================
 function crearTarjetaHTML(t) {
   const el = document.createElement("details");
   el.open = false; // plegadas por defecto

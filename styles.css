@@ -63,7 +63,10 @@ summary::-webkit-details-marker{display:none;}
 
 .card-content{display:flex;gap:1em;align-items:center;text-align:left;}
 .card-text{flex:1;}
-.card-image{max-width:120px;border-radius:12px;}
+.card-image {
+  max-width: 120px;
+  border-radius: 12px;
+}
 
 /* ===== Botones ===== */
 button{

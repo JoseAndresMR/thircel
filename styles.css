@@ -130,7 +130,7 @@ button:hover {
   transform: translateY(-2px); /* Efecto de elevación */
 }
 
-/* ===== Modal ===== */
+* ===== Modal ===== */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -139,6 +139,7 @@ button:hover {
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  transition: opacity 0.5s ease-in-out; /* Transición de opacidad */
 }
 
 .modal-box {
@@ -150,7 +151,12 @@ button:hover {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   position: relative;
   text-align: left;
-  transition: transform 0.3s ease;
+  transform: translateY(-20px); /* Comienza fuera de la pantalla */
+  transition: transform 0.3s ease-in-out; /* Efecto de deslizamiento */
+}
+
+.modal-overlay.active .modal-box {
+  transform: translateY(0); /* Desliza hacia abajo */
 }
 
 .close-modal {
@@ -322,3 +328,5 @@ footer {
   height: 100vh;
   background: transparent;
 }
+
+

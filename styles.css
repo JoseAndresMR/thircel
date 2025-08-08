@@ -9,7 +9,7 @@ body {
   padding: 0;
   text-align: center;
   background: url("https://joseandresmr.github.io/thircel/img/fondo.png") center/cover fixed no-repeat;
-  transition: background 0.3s ease; /* Transición del fondo */
+  transition: background-color 0.5s ease; /* Transición en el fondo */
 }
 
 /* ===== Header ===== */
@@ -20,11 +20,11 @@ body {
   border-radius: 16px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
   background: rgba(255, 255, 255, 0.95);
-  transition: transform 0.3s ease, background 0.3s ease;
+  transition: transform 0.3s ease-in-out; /* Transición de entrada */
 }
 
 .header:hover {
-  transform: scale(1.02); /* Efecto de escala en hover */
+  transform: scale(1.02); /* Efecto de ampliación al pasar el mouse */
 }
 
 /* ===== Página de 3 columnas: stats | tarjetas | calendario ===== */
@@ -35,7 +35,7 @@ body {
   grid-template-columns: 280px minmax(320px, 800px) 320px;
   gap: 16px;
   align-items: start;
-  transition: all 0.3s ease; /* Efecto de transición */
+  transition: grid-template-columns 0.3s ease-in-out; /* Transición de la disposición de columnas */
 }
 
 /* Sidebars que “hacen roll” con el contenido */
@@ -43,7 +43,7 @@ body {
   position: sticky;
   top: var(--sticky-top);
   align-self: start;
-  transition: transform 0.3s ease; /* Transición de las sidebars */
+  transition: top 0.3s ease-in-out; /* Efecto al hacer scroll */
 }
 
 /* ===== Tarjetas ===== */
@@ -52,7 +52,7 @@ body {
   padding: 0 4px;
   max-width: 800px;
   margin: 0 auto;
-  transition: transform 0.3s ease; /* Efecto de transición */
+  transition: opacity 0.3s ease-in-out; /* Desvanecimiento */
 }
 
 details {
@@ -60,16 +60,12 @@ details {
   padding: 1em;
   margin: 1em 0;
   border-radius: 10px;
+  transition: max-height 0.3s ease-out; /* Transición de expansión */
   overflow: hidden;
-  transition: max-height 0.3s ease-out; /* Animación de expansión */
 }
 
 details[open] {
-  max-height: 1000px; /* Altura máxima cuando esté abierto */
-}
-
-details:not([open]) {
-  max-height: 0; /* Colapsado: sin altura */
+  max-height: 500px;
 }
 
 summary {
@@ -78,6 +74,7 @@ summary {
   margin-bottom: 0.5em;
   cursor: pointer;
   list-style: none;
+  transition: transform 0.2s ease; /* Efecto de animación al pasar el mouse */
 }
 
 summary::-webkit-details-marker {
@@ -95,6 +92,7 @@ summary::-webkit-details-marker {
   gap: 1em;
   align-items: center;
   text-align: left;
+  transition: transform 0.3s ease-in-out; /* Suaviza el contenido al mostrar */
 }
 
 .card-text {
@@ -104,29 +102,29 @@ summary::-webkit-details-marker {
 .card-image {
   max-width: 120px;
   border-radius: 12px;
-  transition: transform 0.3s ease; /* Animación de imagen */
+  transition: transform 0.3s ease;
 }
 
 .card-image:hover {
-  transform: scale(1.05); /* Efecto de zoom sobre la imagen */
+  transform: scale(1.1); /* Efecto de ampliación de imagen al pasar el mouse */
 }
 
 /* ===== Botones ===== */
 button {
   background: linear-gradient(to right, #f78ca0, #f9748f);
-  color: white;
+  color: #fff;
   border: none;
   padding: 0.6em 1.2em;
   border-radius: 10px;
   cursor: pointer;
   font-weight: bold;
-  transition: background 0.3s ease, transform 0.2s ease;
+  transition: background 0.3s ease, transform 0.2s ease; /* Transición suave */
   margin: 0.5em;
 }
 
 button:hover {
   background: linear-gradient(to right, #f65c78, #f65175);
-  transform: translateY(-2px); /* Efecto de elevación */
+  transform: translateY(-2px); /* Sube ligeramente al pasar el mouse */
 }
 
 /* ===== Modal ===== */
@@ -138,7 +136,7 @@ button:hover {
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  transition: opacity 0.5s ease-in-out; /* Transición de opacidad */
+  transition: opacity 0.5s ease-in-out;
 }
 
 .modal-box {
@@ -150,8 +148,8 @@ button:hover {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   position: relative;
   text-align: left;
-  transform: translateY(-20px); /* Comienza fuera de la pantalla */
-  transition: transform 0.3s ease-in-out; /* Efecto de deslizamiento */
+  transform: translateY(-20px); /* Inicia fuera de la pantalla */
+  transition: transform 0.3s ease-in-out;
 }
 
 .modal-overlay.active .modal-box {
@@ -178,12 +176,14 @@ button:hover {
   border-radius: 16px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
   padding: 12px;
+  transition: opacity 0.3s ease-in-out;
 }
 
 .calendar-title {
   font-weight: 700;
   margin: 4px 0 8px;
   text-transform: capitalize;
+  transition: color 0.3s ease; /* Transición en el color */
 }
 
 .calendar-grid {
@@ -203,20 +203,15 @@ button:hover {
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.cal-day:hover {
-  background-color: rgba(255, 255, 255, 0.75);
-  transform: scale(1.05); /* Efecto de escala al pasar el ratón */
-}
-
 .cal-head {
   font-weight: 700;
   opacity: 0.8;
 }
 
-/* Estados de día */
 .cal-day.today {
   outline: 2px solid #f9748f;
   font-weight: bold;
+  transition: transform 0.3s ease;
 }
 
 .cal-day.birthday {
@@ -236,9 +231,9 @@ button:hover {
 
 .cal-day.upcoming {
   background: #81d4fa;
+  transition: background-color 0.3s ease;
 }
 
-/* Leyenda calendario */
 .calendar-legend {
   display: flex;
   flex-wrap: wrap;
@@ -282,6 +277,7 @@ button:hover {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
   padding: 12px;
   text-align: left;
+  transition: opacity 0.3s ease-in-out;
 }
 
 .stats-title {
@@ -306,7 +302,7 @@ button:hover {
 .progress > span {
   display: block;
   height: 100%;
-  background: #f9748f; /* barra principal */
+  background: #f9748f;
 }
 
 /* ===== Responsive: en móviles apilamos columnas ===== */
@@ -327,5 +323,3 @@ footer {
   height: 100vh;
   background: transparent;
 }
-
-

@@ -93,6 +93,10 @@ function showModal(card){
       </div>
     </div>`;
   modal.style.display = "block";
+
+  // Sonido cuando se descubre la tarjeta
+  const audio = new Audio('https://www.soundjay.com/button/beep-07.wav');
+  audio.play();
 }
 window.closeModal = (ev)=>{
   if(ev) ev.stopPropagation();

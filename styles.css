@@ -60,12 +60,16 @@ details {
   padding: 1em;
   margin: 1em 0;
   border-radius: 10px;
-  transition: background-color 0.3s ease, transform 0.3s ease; /* Transición suave */
+  overflow: hidden;
+  transition: max-height 0.3s ease-out; /* Animación de expansión */
 }
 
-details:hover {
-  background-color: rgba(255, 255, 255, 0.85);
-  transform: scale(1.02); /* Efecto de escala */
+details[open] {
+  max-height: 1000px; /* Altura máxima cuando esté abierto */
+}
+
+details:not([open]) {
+  max-height: 0; /* Colapsado: sin altura */
 }
 
 summary {
@@ -74,11 +78,6 @@ summary {
   margin-bottom: 0.5em;
   cursor: pointer;
   list-style: none;
-  transition: color 0.3s ease; /* Cambio de color en hover */
-}
-
-summary:hover {
-  color: #f9748f;
 }
 
 summary::-webkit-details-marker {
@@ -130,7 +129,7 @@ button:hover {
   transform: translateY(-2px); /* Efecto de elevación */
 }
 
-* ===== Modal ===== */
+/* ===== Modal ===== */
 .modal-overlay {
   position: fixed;
   inset: 0;

@@ -158,8 +158,6 @@ function crearTarjetaHTML(t){
   return el;
 }
 
-function pct(a,b){ return b>0 ? Math.round((a/b)*100) : 0; }
-
 function renderStats(counts, releasedSet, upcomingSet){
   const el = document.getElementById("stats-container");
   if(!el) return;
@@ -172,11 +170,11 @@ function renderStats(counts, releasedSet, upcomingSet){
 
       <div class="stat-row"><span>Total visibles</span><strong>${visibles}</strong></div>
 
-      <div class="stat-row"><span>Descubiertas</span><strong>${descubiertas}/${visibles}</strong></div>
-      <div class="progress"><span style="width:${pct(descubiertas,visibles)}%"></span></div>
+      <div class="stat-row"><span>Descubiertas</span><strong>${descubiertas}</strong></div>
+      <div class="progress"><span style="width:${(descubiertas/visibles)*100}%"></span></div>
 
-      <div class="stat-row"><span>Usadas</span><strong>${usadas}/${descubiertas}</strong></div>
-      <div class="progress"><span style="width:${pct(usadas,descubiertas)}%"></span></div>
+      <div class="stat-row"><span>Usadas</span><strong>${usadas}</strong></div>
+      <div class="progress"><span style="width:${(usadas/descubiertas)*100}%"></span></div>
 
       <div class="stat-row"><span>Pendientes (sin usar)</span><strong>${pendientes}</strong></div>
 
@@ -187,8 +185,8 @@ function renderStats(counts, releasedSet, upcomingSet){
 
       <hr style="border:none;border-top:1px solid #eee;margin:.75em 0;" />
 
-      <div class="stat-row"><span>Liberadas en el periodo</span><strong>${releasedSet.size}/${CONFIG.days}</strong></div>
-      <div class="progress"><span style="width:${pct(releasedSet.size,CONFIG.days)}%"></span></div>
+      <div class="stat-row"><span>Liberadas en el periodo</span><strong>${releasedSet.size}</strong></div>
+      <div class="progress"><span style="width:${(releasedSet.size/CONFIG.days)*100}%"></span></div>
 
       <div class="stat-row"><span>Próximas (normales)</span><strong>${upcomingSet.size}</strong></div>
     </div>
@@ -242,8 +240,8 @@ async function cargarTarjetas(){
     }
   });
 
-  renderCalendar(releasedSet, upcomingSet);
   renderStats(counts, releasedSet, upcomingSet);
+  renderCalendar(releasedSet, upcomingSet);
 }
 
 /* Marcar usada */

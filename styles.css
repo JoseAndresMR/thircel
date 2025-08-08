@@ -1,6 +1,6 @@
 /* ===== Global ===== */
 :root {
-  --sticky-top: 96px; /* se recalcula por JS con la altura real del header */
+  --sticky-top: 96px; /* Se recalcula por JS con la altura real del header */
 }
 
 body {
@@ -9,7 +9,7 @@ body {
   padding: 0;
   text-align: center;
   background: url("https://joseandresmr.github.io/thircel/img/fondo.png") center/cover fixed no-repeat;
-  transition: background 0.3s ease; /* Fondo suave */
+  transition: background 0.3s ease; /* Transición del fondo */
 }
 
 /* ===== Header ===== */
@@ -24,12 +24,12 @@ body {
 }
 
 .header:hover {
-  transform: scale(1.02); /* Efecto de escala */
+  transform: scale(1.02); /* Efecto de escala en hover */
 }
 
 /* ===== Página de 3 columnas: stats | tarjetas | calendario ===== */
 .page {
-  max-width: 1400px; /* 280 + 800 + 320 = 1400 */
+  max-width: 1400px;
   margin: 0 auto 2rem;
   display: grid;
   grid-template-columns: 280px minmax(320px, 800px) 320px;
@@ -43,7 +43,7 @@ body {
   position: sticky;
   top: var(--sticky-top);
   align-self: start;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease; /* Transición de las sidebars */
 }
 
 /* ===== Tarjetas ===== */
@@ -65,7 +65,7 @@ details {
 
 details:hover {
   background-color: rgba(255, 255, 255, 0.85);
-  transform: scale(1.02); /* Efecto de escala al pasar el mouse */
+  transform: scale(1.02); /* Efecto de escala */
 }
 
 summary {
@@ -78,7 +78,7 @@ summary {
 }
 
 summary:hover {
-  color: #f9748f; /* Cambiar el color al pasar el ratón */
+  color: #f9748f;
 }
 
 summary::-webkit-details-marker {
@@ -127,7 +127,7 @@ button {
 
 button:hover {
   background: linear-gradient(to right, #f65c78, #f65175);
-  transform: translateY(-2px); /* Efecto de hover con elevación */
+  transform: translateY(-2px); /* Efecto de elevación */
 }
 
 /* ===== Modal ===== */
@@ -195,6 +195,12 @@ button:hover {
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.6);
   text-align: center;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.cal-day:hover {
+  background-color: rgba(255, 255, 255, 0.75);
+  transform: scale(1.05); /* Efecto de escala al pasar el ratón */
 }
 
 .cal-head {

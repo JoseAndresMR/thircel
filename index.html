@@ -16,20 +16,26 @@
       </div>
     </div>
 
-    <!-- Calendario (sidebar fijo a la derecha) -->
-    <div id="calendar-container"></div>
+    <!-- Contenedor de 3 columnas: stats | tarjetas | calendario -->
+    <div class="page">
+      <!-- Sidebar izquierda: estadísticas -->
+      <aside id="stats-container" class="sidebar"></aside>
 
-    <!-- Listas de tarjetas (centradas; el calendario no las empuja) -->
-    <div class="toggle-section">
-      <details>
-        <summary><span class="summary-clickable">🕒 Tarjetas pendientes</span></summary>
-        <div id="tarjetas-lista"></div>
-      </details>
+      <!-- Columna central: tarjetas (plegadas) -->
+      <main class="toggle-section">
+        <details>
+          <summary><span class="summary-clickable">🕒 Tarjetas pendientes</span></summary>
+          <div id="tarjetas-lista"></div>
+        </details>
 
-      <details>
-        <summary><span class="summary-clickable">✅ Tarjetas usadas</span></summary>
-        <div id="tarjetas-usadas"></div>
-      </details>
+        <details>
+          <summary><span class="summary-clickable">✅ Tarjetas usadas</span></summary>
+          <div id="tarjetas-usadas"></div>
+        </details>
+      </main>
+
+      <!-- Sidebar derecha: calendario -->
+      <aside id="calendar-container" class="sidebar"></aside>
     </div>
 
     <!-- Modal para tarjeta recién descubierta -->

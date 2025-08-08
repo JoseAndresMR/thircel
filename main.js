@@ -89,7 +89,7 @@ window.activarModoAdmin = () => {
 function showModal(card) {
   const modal = document.getElementById("modal");
   modal.innerHTML = `
-    <div class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-overlay active" onclick="closeModal(event)">
       <div class="modal-box" onclick="event.stopPropagation()">
         <button class="close-modal" onclick="closeModal()">✖</button>
         <h2>${card.titulo}</h2>
@@ -103,6 +103,7 @@ function showModal(card) {
   const audio = new Audio('https://www.soundjay.com/button/beep-07.wav');
   audio.play();
 }
+
 window.closeModal = (ev) => {
   if (ev) ev.stopPropagation();
   document.getElementById("modal").style.display = "none";

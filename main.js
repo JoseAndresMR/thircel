@@ -41,9 +41,10 @@ async function loadConfig() {
     CONFIG.days         = Number(c.diasCelebracion || 31);
     CONFIG.showSorpresa = !!c.mostrarBotonSorpresaPublico;
   }
+  // Fallback si no tenemos fechaInicio
   if (!CONFIG.start || isNaN(CONFIG.start.getTime())) {
     const t = new Date();
-    CONFIG.start = new Date(t.getFullYear(), 7, 10); // fallback: 10-ago
+    CONFIG.start = new Date(t.getFullYear(), 7, 10); // 10-ago
   }
 }
 
@@ -96,7 +97,7 @@ function showModal(card){
 window.closeModal = (ev)=>{
   if(ev) ev.stopPropagation();
   document.getElementById("modal").style.display = "none";
-  cargarTarjetas(); // refresca listas y calendario
+  cargarTarjetas(); // refresca listas y calendario y stats
 };
 
 /* ===========================
@@ -138,11 +139,11 @@ async function mostrarTarjeta(tipo){
 window.mostrarTarjeta = mostrarTarjeta;
 
 /* ===========================
-   Listado de tarjetas
+   Listado de tarjetas + Stats
 =========================== */
 function crearTarjetaHTML(t){
   const el = document.createElement("details");
-  el.open = false; // — plegadas por defecto —
+  el.open = false; // plegadas por defecto
   el.innerHTML = `
     <summary class="summary-clickable">${t.titulo}</summary>
     <div class="card-content">
@@ -157,24 +158,70 @@ function crearTarjetaHTML(t){
   return el;
 }
 
+function pct(a,b){ return b>0 ? Math.round((a/b)*100) : 0; }
+
+function renderStats(counts, releasedSet, upcomingSet){
+  const el = document.getElementById("stats-container");
+  if(!el) return;
+
+  const { visibles, descubiertas, usadas, pendientes, sorpDesc, sorpPend } = counts;
+
+  el.innerHTML = `
+    <div class="stats-card">
+      <div class="stats-title">📊 Estadísticas</div>
+
+      <div class="stat-row"><span>Total visibles</span><strong>${visibles}</strong></div>
+
+      <div class="stat-row"><span>Descubiertas</span><strong>${descubiertas}/${visibles}</strong></div>
+      <div class="progress"><span style="width:${pct(descubiertas,visibles)}%"></span></div>
+
+      <div class="stat-row"><span>Usadas</span><strong>${usadas}/${descubiertas}</strong></div>
+      <div class="progress"><span style="width:${pct(usadas,descubiertas)}%"></span></div>
+
+      <div class="stat-row"><span>Pendientes (sin usar)</span><strong>${pendientes}</strong></div>
+
+      <hr style="border:none;border-top:1px solid #eee;margin:.75em 0;" />
+
+      <div class="stat-row"><span>Sorpresas descubiertas</span><strong>${sorpDesc}</strong></div>
+      <div class="stat-row"><span>Sorpresas pendientes</span><strong>${sorpPend}</strong></div>
+
+      <hr style="border:none;border-top:1px solid #eee;margin:.75em 0;" />
+
+      <div class="stat-row"><span>Liberadas en el periodo</span><strong>${releasedSet.size}/${CONFIG.days}</strong></div>
+      <div class="progress"><span style="width:${pct(releasedSet.size,CONFIG.days)}%"></span></div>
+
+      <div class="stat-row"><span>Próximas (normales)</span><strong>${upcomingSet.size}</strong></div>
+    </div>
+  `;
+}
+
 async function cargarTarjetas(){
   const snap = await getDocs(collection(db,"tarjetas"));
   const pend = document.getElementById("tarjetas-lista");
   const used = document.getElementById("tarjetas-usadas");
   pend.innerHTML = ""; used.innerHTML = "";
 
+  // Conjuntos para calendario y contadores para stats
   const releasedSet = new Set();  // fechas descubiertas dentro del rango
-  const upcomingSet = new Set();  // futuras programadas (normales) dentro del rango
+  const upcomingSet = new Set();  // futuras (normales) dentro del rango
+  const counts = { visibles:0, descubiertas:0, usadas:0, pendientes:0, sorpDesc:0, sorpPend:0 };
 
   snap.docs.forEach(d=>{
     const x = d.data();
+    if (x.visible) counts.visibles++;
 
+    // Stats de sorpresas
+    if (x.sorpresaPublica){
+      if (x.descubierta) counts.sorpDesc++; else counts.sorpPend++;
+    }
+
+    // Marcas para calendario
     if (x.descubierta) {
+      counts.descubiertas++;
       let f = null;
       if (x.fechaDescubierta?.toDate) f = x.fechaDescubierta.toDate();
       else if (typeof x.fechaDescubierta === "string") f = new Date(x.fechaDescubierta);
       else if (x.fechaDisponible) f = new Date(x.fechaDisponible);
-
       if (f && inRange(f)) releasedSet.add(toISODate(f));
     } else {
       if (x.visible && !x.sorpresaPublica && x.fechaDisponible) {
@@ -183,12 +230,20 @@ async function cargarTarjetas(){
       }
     }
 
+    // Listas de tarjetas descubiertas
     if(!x.descubierta || !x.visible) return;
     const card = crearTarjetaHTML({id:d.id, ...x});
-    (x.usada ? used : pend).appendChild(card);
+    if (x.usada){
+      counts.usadas++;
+      used.appendChild(card);
+    } else {
+      counts.pendientes++;
+      pend.appendChild(card);
+    }
   });
 
   renderCalendar(releasedSet, upcomingSet);
+  renderStats(counts, releasedSet, upcomingSet);
 }
 
 /* Marcar usada */
@@ -198,7 +253,7 @@ window.marcarUsadaPorId = async id=>{
 };
 
 /* ===========================
-   Calendario (sidebar)
+   Calendario (sidebar derecha)
 =========================== */
 function monthNameES(date){
   return date.toLocaleDateString("es-ES",{month:"long", year:"numeric"});
@@ -248,8 +303,8 @@ function renderCalendar(releasedSet, upcomingSet){
     cell.className = "cal-day";
     cell.textContent = d.getDate();
 
-    if (iso === todayIso)         cell.classList.add("today");
-    if (iso === birthdayISO())    cell.classList.add("birthday"); // cumple = fechaInicio
+    if (iso === todayIso)      cell.classList.add("today");
+    if (iso === birthdayISO()) cell.classList.add("birthday"); // cumple = fechaInicio
 
     const past = new Date(iso) < new Date(todayIso);
     if (past){
@@ -262,21 +317,17 @@ function renderCalendar(releasedSet, upcomingSet){
     cal.appendChild(cell);
   }
 
-  positionCalendarSidebar();
+  updateStickyTop();
 }
 
-/* Sidebar: coloca el calendario justo bajo el header (en desktop) */
-function positionCalendarSidebar(){
-  const cal = document.getElementById("calendar-container");
+/* ===== Sticky: coloca sidebars justo bajo el header ===== */
+function updateStickyTop(){
   const header = document.querySelector(".header");
-  if (!cal || !header) return;
-
-  // si quieres que siempre esté fijo, no checks de ancho
-  const top = header.offsetTop + header.offsetHeight + 12;
-  cal.style.top = `${top}px`;
+  const top = (header?.offsetTop || 0) + (header?.offsetHeight || 0) + 12;
+  document.documentElement.style.setProperty("--sticky-top", `${top}px`);
 }
-window.addEventListener("resize", positionCalendarSidebar);
-window.addEventListener("scroll", positionCalendarSidebar);
+window.addEventListener("resize", updateStickyTop);
+window.addEventListener("scroll", updateStickyTop);
 
 /* ===========================
    Arranque
@@ -288,5 +339,5 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   await loadConfig();      // lee fechaInicio, diasCelebracion, sorpresa
   cargarTarjetas();
   verificarBotones();
-  positionCalendarSidebar();
+  updateStickyTop();
 });

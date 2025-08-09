@@ -21,8 +21,9 @@ body{
 }
 
 /* ===== Página de 3 columnas: stats | tarjetas | calendario ===== */
-.page{
-  max-width: 1400px;              /* 280 + 800 + 320 = 1400 */
+/* ===== Página de 3 columnas: stats | tarjetas | calendario ===== */
+.page {
+  max-width: 1400px;  /* Total de 1400px (280 + 800 + 320) */
   margin: 0 auto 2rem;
   display: grid;
   grid-template-columns: 280px minmax(320px, 800px) 320px;
@@ -38,19 +39,32 @@ body{
 }
 
 /* ===== Tarjetas ===== */
-.toggle-section{
-  background:transparent;
-  padding:0 4px;
-  max-width:800px;
-  margin:0 auto;
+/* Aseguramos que las tarjetas tengan un ancho fijo incluso cuando se despliegan */
+.toggle-section {
+  background: transparent;
+  padding: 0 4px;
+  max-width: 800px; /* Fijo */
+  margin: 0 auto;
+  width: 100%; /* Aseguramos que siempre ocupe el 100% del ancho disponible */
+  transition: width 0.3s ease; /* Suavizamos la transición al cambiar el tamaño */
 }
 
-details{
-  background:rgba(255,255,255,.75);
-  padding:1em;
-  margin:1em 0;
-  border-radius:10px;
+/* Aseguramos que las tarjetas se ajusten */
+/* Transición de apertura/cierre de las tarjetas */
+details {
+  background: rgba(255, 255, 255, 0.75);
+  padding: 1em;
+  margin: 1em 0;
+  border-radius: 10px;
+  max-width: 100%;
+  overflow: hidden;
+  transition: all 0.5s ease-out; /* Añadimos una transición para suavizar el deslizamiento */
 }
+
+
+
+
+
 summary{
   font-weight:bold;
   font-size:1.2em;
@@ -61,7 +75,18 @@ summary{
 summary::-webkit-details-marker{display:none;}
 .summary-clickable{display:inline-block;width:100%;cursor:pointer;}
 
-.card-content{display:flex;gap:1em;align-items:center;text-align:left;}
+/* Añadimos suavizado al "content" de las tarjetas */
+.card-content {
+  display: flex;
+  gap: 1em;
+  align-items: center;
+  text-align: left;
+  opacity: 0; /* Comienza oculto */
+  transition: opacity 0.5s ease-in-out; /* Transición suave al abrir */
+}
+details[open] .card-content {
+  opacity: 1; /* Se muestra al abrir */
+}
 .card-text{flex:1;}
 .card-image {
   max-width: 240px;  /* Puedes poner el tamaño que prefieras */

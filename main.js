@@ -306,4 +306,22 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   cargarTarjetas();
   verificarBotones();
   updateStickyTop();
+  // Aplicar colores aleatorios a las tarjetas
+  applyCardColors();
 });
+
+function getRandomColor() {
+  const colors = [
+    "#f8e1f4", "#d8d8e8", "#d2f4f1", "#f7d3e2", "#d6f8d0", "#e2f1f7"
+  ]; // Colores suaves
+  return colors[Math.floor(Math.random() * colors.length)];
+}
+function applyCardColors() {
+  const cards = document.querySelectorAll(".card-toggle");
+  cards.forEach(card => {
+    const randomColor = getRandomColor();
+    card.style.backgroundColor = randomColor;
+    const summary = card.querySelector("summary");
+    if (summary) summary.style.backgroundColor = randomColor; // Cambiar también el fondo del summary
+  });
+}

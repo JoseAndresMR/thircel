@@ -62,12 +62,18 @@ const inRange     = d => {
 =========================== */
 function yaAbrioHoy(tipo){ return localStorage.getItem("ultima"+tipo) === hoyISO(); }
 
-function verificarBotones(){
+function verificarBotones() {
   const bS = document.getElementById("boton-sorpresa");
   const bN = document.getElementById("boton-normal");
 
-  bS.style.display = (CONFIG.showSorpresa && (!yaAbrioHoy("Sorpresa") || modoAdmin))
-    ? "inline-block" : "none";
+  // Asegurarse de que el botón de sorpresa se muestra siempre que esté habilitado en la configuración
+  if (CONFIG.showSorpresa) {
+    bS.style.display = (!yaAbrioHoy("Sorpresa") || modoAdmin) ? "inline-block" : "inline-block"; // Siempre visible si está habilitado
+  } else {
+    bS.style.display = "none"; // Se oculta si no está habilitado
+  }
+
+  // Mostrar el botón de tarjeta normal si no se ha mostrado hoy o en modo admin
   bN.style.display = (!yaAbrioHoy("Normal") || modoAdmin)
     ? "inline-block" : "none";
 }
